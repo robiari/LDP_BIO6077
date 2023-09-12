@@ -1,0 +1,337 @@
+---
+title: "Travail de session"
+author: "Ariane Roberge"
+date: "`r Sys.Date()`"
+output:
+  word_document: 
+    reference_docx: texte_modele.docx
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  comment = "#",
+  #collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  #cache = TRUE,
+  fig.width=7, fig.height=5, fig.retina=3
+  #fig.align = 'center' # not supported for docx output
+)
+```
+
+```{r pander, warning=FALSE, echo=FALSE}
+# set pander table-layout options
+library(pander)
+panderOptions('table.alignment.default', function(df)
+    ifelse(sapply(df, is.numeric), 'right', 'left'))
+panderOptions('table.split.table', Inf)
+panderOptions('big.mark', ",")
+panderOptions('keep.trailing.zeros', TRUE)
+```
+
+```{r Importation des packages, echo=FALSE}
+library(sf)
+library(esri2sf)
+library(tidyverse)
+```
+
+# Introduction
+## Contexte et problématique
+Le premier objectif est de cibler les communautés écoforestières présentes sur le territoire inventorié à la Station de biologie des Laurentides (SBL) de l’Université de Montréal. Le second consiste à déterminer les variables influençant la composition des communautés à différentes échelles spatiales. Finalement, le dernier objectif consiste à analyser les relations entre la distribution des arbres de la SBL, leurs traits fonctionnels ainsi que les variables topographiques.
+
+# Matériel
+## Lieu d'étude
+Cette étude a nécessité plusieurs campagnes d’échantillonnage, toutes se déroulant à la Station de biologie des Laurentides de l’Université de Montréal.
+
+```{r Liste espèces, echo=FALSE}
+# Fichier différent de especes.txt, car PIMA, PIRU, PIGL n'ont pas été changés en Picea.
+especes_tab <- read.table('data_input/especes_tab.txt', header = TRUE, sep = ";") %>%
+  rename(`Nom scientifique (latin)` = 'scientific_name',
+         `Code d'espèce` = 'codesp')
+knitr::kable(especes_tab,
+ caption = "Tableau 1 : Espèces présentes à la SBL")
+```
+
+## Plan d'échantillonnage
+Au cours de l’été 2021, dans le cadre du projet de maîtrise de Myriam Cloutier, étudiante dans le laboratoire d’écologie fonctionnelle végétale (LEFO) d’Etienne Laliberté, de l’imagerie RGB à haute résolution fut acquise par drone à plusieurs reprises au-dessus de SBL. Les vols furent réalisés tous les mois de mai à octobre à l’aide du drone *DJI Phantom 4 RTK* afin d’obtenir des images témoignant des changements phénologiques des arbres à travers la saison. Puis, à l’aide du logiciel de photogrammétrie *Agisoft Metashape*, une orthomosaïque, c’est-à-dire …, a été générée par mission de vol. Dans ce logiciel, mais aussi pour l’ensemble des analyses spatiales effectuées après coup, le datum de référence ayant été choisi est le système canadien de référence spatiale, soit NAD83 (SCRS) époque 1997 (aussi appelé version 2), et la projection est la Mercator Transverse Modifiée (MTM) pour le fuseau 8 (EPSG : 2950).
+
+Ces vols de drone ont permis de survoler environ 43 hectares de forêt, se divisant en zones 1, 2 et 3. Un inventaire exhaustif des arbres a été réalisé par une équipe de terrain constituée de Myriam ainsi que trois auxiliaires de recherche au cours du même été. Celle-ci a procédé au géoréférencement, à l’identification et à l’annotation de chacun des arbres atteignant la canopée et, donc, étant visible sur des orthomosaïques produites. Ces annotations consistent en des polygones d’arbres ayant été tracés à la main à l’aide d’une surface à dessin et du logiciel *ArcGIS Pro* afin de délimiter les couronnes d’arbres. Ainsi, il en résulte un énorme tableau de variables réponses dont chacune des entités du tableau représente un arbre géoréférencé ayant été identifié à l’espèce sur le terrain.
+
+## Tableaux de données
+### Arbres inventoriés
+Pour ce travail de session, nous nous limiterons à l’étude de la zone 1, représentant une superficie d’environ 20 hectares, afin de ne pas avoir un jeu de données trop lourd (plus de 30 000 arbres). Après le nettoyage des données, le jeu de données comportant les entités relatives aux polygones des arbres de cette zone compte 9818 lignes et quatre colonnes. Pour chaque individu (entité), on note un identifiant unique, un code d’espèce, les coordonnées géographiques du polygone (longitude, latitude : mètres) et la surface occupée par sa couronne (m2). Au total, on retrouve 18 essences d’arbres, dont une catégorie regroupant toutes les espèces d’épinettes inventoriées; toutes les autres catégories sont des espèces d’arbres. Les différentes espèces d’épinettes ont été regroupées au genre et non à l’espèce étant donné qu’elles s’hybrident fréquemment entre elles et, donc, que les erreurs d’identification sont beaucoup plus fréquentes au sein de ce genre.
+
+```{r Importation et nettoyage des données darbres, echo=FALSE}
+#### Importation et nettoyage des données d'arbres (type sf) ----
+Z1_polygones <- read_sf("data_input/Z1_polygones.geojson") %>% # on lit le fichier
+  st_transform(2950) %>% # on transforme au code 2950
+  select(OBJECTID, Label, surf_m2) %>% # on sélectionne les variables pertinentes
+  filter(Label != 'Mort' & Label != 'Acer' & Label != 'Populus' & Label != 'Feuillus' & Label != 'Conifere' & Label != 'Betula' & Label != 'PRPE') # on enlève les classes non représentatives
+
+# Regroupement de tous les Picea dans une même classe
+Z1_polygones$Label[Z1_polygones$Label %in% c("PIGL","PIRU","PIMA")] <- "Picea" 
+```
+
+```{r Visualisation tableau Z1_polygones, echo=FALSE}
+table2 <- head(Z1_polygones) %>%
+  rename('Superficie' = 'surf_m2',
+         `Code d'espèce` = 'Label',
+         'Géométrie' = geometry)
+knitr::kable(table2,
+ caption = "Tableau 2 : Polygones des arbres inventoriés dans la zone 1")
+```
+
+### Placettes forestières
+Afin de représenter les normes des placettes forestières réalisées lors des inventaires forestiers gouvernementaux, l’orthomosaïque sur laquelle les polygones d’arbres ont été tracés a été découpée en placettes de 20 m x 20 m à l’aide d’une grille. Cette opération a été effectuée à l’aide d’objets de type « sf » dans R afin de conserver les coordonnées des centroïdes de chacune d’entre elles. Par la suite, un tableau regroupant les placettes ainsi que leurs coordonnées géographiques a alors pu être créé. Dès lors, une sélection a été réalisée de sorte à ne conserver que les placettes ayant plus de 40% de leur superficie annotée pour n’avoir que celles étant représentatives d’une forêt naturelle. Cette opération a alors permis d’éliminer les limites des annotations ainsi que quelques placettes étant traversées par des sentiers de randonnée. Enfin, 402 placettes géoréférencées ont été prises en compte dans les analyses, comportant au total 8917 arbres.
+
+```{r Visualisation tableau grid_coord, echo=FALSE}
+table3 <- read.csv("data_output/grid_coord.csv") %>%
+  rename("X (m)" = X,
+         "Y (m)" = Y)
+table3 <- table3[, c(3, 1, 2)] #On réordonne le dataframe pour avoir le grid_id en 1ère colonne
+knitr::kable(head(table3),
+ caption = "Tableau 3 : Placettes forestières")
+```
+
+### Abondances d’espèces d’arbres
+Par conséquent, chacun des arbres géoréférencés a ensuite pu être associé à sa placette respective à l’aide d’une jointure spatiale, toujours en conservant les objets en type « sf ». Deux jointures spatiales ont été réalisées : une première pour ajouter une colonne indiquant la placette dans laquelle chaque individu se retrouve, puis une deuxième pour obtenir un tableau d'abondance des essences d’arbres par placette.
+
+```{r Visualisation tableau spe, echo=FALSE}
+table4 <- read.csv("data_output/spe.csv", row.names=1)
+knitr::kable(head(table4),
+ caption = "Tableau 4 : Composition des placettes forestières", row.names = TRUE)
+```
+
+### Variables topographiques
+La matrice explicative est constituée de cinq variables topographiques : l’élévation topographique (unités : mètres), la pente (unités : %), son orientation (représenté par eastness et northness exposure; unités : radians) ainsi que l’indice d’humidité topographique (quantitatif; sans unité). Toutes ces variables sont extraites ou calculées à partir des produits dérivés du LiDAR provenant des données écoforestières du Ministère des Forêts, de la Faune et des Parcs (MFFP). Initialement, elles étaient toutes représentées à l’aide de données matricielles, il a donc été nécessaire d’extraire la moyenne des valeurs de ces variables pour chacune des placettes 20 x 20 m.
+
+L'élévation et l’indice d’humidité topographique ont été directement extraits des produits dérivés LiDAR, respectivement du modèle numérique de terrain (MNT) et de l’indice d’humidité topographique (TWI), sans modification supplémentaire. La pente a été obtenue en utilisant la fonction *slope* du package *starsExtra* sur ce même MNT, donnant alors une pente en degrés pouvant donner des valeurs se situant entre 0 et 360°. Cependant, étant donné que les valeurs étaient toutes situées dans le premier quadrant (0-90°), il a été possible de rapporter des valeurs sur 100 afin d’obtenir un pourcentage d’inclinaison. Pour ce qui est des variables d’orientation de la pente, soit eastness exposure et northness exposure, avant de considérer le degré d’exposition, il a d’abord fallu calculer les variables eastness et northness. Pour ce faire, la fonction *aspect* du package *starsExtra* indiquant la direction (en degrés, 0-360°) vers laquelle la pente fait face a été appliquée sur le MNT, puis le tout a été transformé en radians. Étant une variable circulaire, les transformations trigonométriques $sin()$ et $cos()$ ont ensuite été appliquées sur la variable aspect afin de l’utiliser dans des modèles linéaires tout comme les autres variables. Pour résumé, les variables eastness et northness ont d’abord dû être calculées selon les équations suivantes:\
+
+$Eastness = sin(aspect(mnt) * π / 180)$ \
+$Northness = cos(aspect(mnt) * π / 180)$
+
+Puis, celles-ci ont été mises en relation avec la pente en radians, à l’aide des équations suivantes:\
+
+$Pente (rad) = (slope(mnt) * π) / 180$\
+et\
+$Eastness exposure = sin(pente)*eastness$\
+$Northness exposure = sin(pente)*northness$
+
+```{r Visualisation tableau grid_topo, echo=FALSE}
+# Importation des placettes forestières avec var. environnementales
+table5 <- read_sf("data_output/grid_topo.geojson") # on lit le fichier
+
+table5 <- table5[, c(1, 6, 5, 7, 10, 11)] %>% #On réordonne le dataframe pour avoir le grid_id en 1ère colonne
+  st_drop_geometry() %>%
+  rename(Pente = slope,
+         Élévation = elev_mnt,
+         `Indice d'humidité topographique` = twi,
+         'Eastness exposure' = eastness_exp,
+         'Northness exposure' = northness_exp)
+
+knitr::kable(head(table5),
+ caption = "Tableau 5 : Variables topographiques relatives à chacune des placettes forestières")
+```
+
+### Traits fonctionnels des arbres
+Par la suite, la matrice des traits fonctionnels des arbres est issue des données de l’Observatoire Aérien Canadien de la Biodiversité (CABO). Pour obtenir le tableau récapitulatif de tous les traits présentés ci-dessous, la moyenne par espèce des valeurs de tous les arbres échantillonnés à la SBL au cours des dernières années (2017-2022), de la mi-juin à la mi-août, a été calculée. Afin de ne pas trop généraliser les résultats obtenus avec les analyses de traits subséquentes, il a été décidé de conserver uniquement les espèces d’arbres étant présentes dans au moins 5% des placettes forestières. Les espèces FRNI, POBA, POTR et QURU ne seront donc pas considérées. Pour les espèces d'arbres sélectionnées, entre 10 et 28 arbres ont été échantillonnés pour les traits fonctionnels.
+
+```{r Visualisation tableau traits, echo=FALSE}
+sp_rares <- c('FRNI', 'POBA', 'POTR', 'QURU')
+
+spe.traits <- read.csv("traits_output/traits_short.csv", row.names=1) # rn pour rownames (garde les grid_id)
+
+spe.traits.sel <- spe.traits[!(row.names(spe.traits) %in% sp_rares),] # On enlève les espèces rares
+
+table6 <- spe.traits.sel %>%
+  rename('C:N' = 'C.N',
+         'Carot:Chltot' = 'Carot.Chltot',
+         'Chla:Chlb' = 'Chla.Chlb')
+knitr::kable(table6,
+ caption = "Tableau 6 : Moyennes des traits fonctionnels foliaires par espèce", digits = 2)
+
+x <- table6[2:8]
+traits_stat <- data.frame('Moyenne' = apply(x, 2, mean, na.rm = TRUE),
+                          'Écart-type' = apply(x, 2, sd, na.rm = TRUE),
+                          'Étendue' = apply(x, 2, max, na.rm = TRUE)-apply(x, 2, min, na.rm = TRUE),
+                          'Cov' = (apply(x, 2, sd, na.rm = TRUE)/apply(x, 2, mean, na.rm = TRUE))*100) %>%
+  t() %>% # transposer le tableau
+  as.data.frame()
+
+knitr::kable(traits_stat,
+ caption = "Tableau 7 : Statistiques sur les moyennes des traits fonctionnels foliaires", digits = 2)
+```
+
+# Méthodes
+## Analyse exploratoire des données
+En premier lieu, une analyse exploratoire des données est réalisée afin d’en apprendre davantage sur les espèces présentes et leur nombre respectif. La distribution des individus au sein des différentes classes d’essences d’arbres peut d’ailleurs être représentée au moyen d’un histogramme de l’abondance en fonction des classes.  Puis, comme il l’a été mentionné, la zone d’échantillonnage est découpée en une grille représentant des placettes forestières d’une dimension de 20 m x 20 m. Il est alors possible de réaliser un histogramme de fréquences indiquant le nombre de fois où sont retrouvées les espèces au sein des placettes. Ces deux histogrammes sont représentés dans la Figure 1. À première vue, ceux-ci semblent indiquer que les données brutes sont très asymétriques avec une forte tendance vers la gauche et, donc, qu’elles auraient probablement besoin d'une transformation logarithmique. Or, considérant que le nombre d’espèces par placette ne varie qu’entre 0 et 6, cette dernière transformation ne semble pas nécessaire.
+
+*Figure 1 : Occurrences et fréquences relatives des espèces*
+
+Par la suite, il semble pertinent d’illustrer l'abondance et la richesse spécifique au sein des placettes afin de noter si une certaine tendance peut déjà être constatée.
+
+*Figure 2 : Abondance et richesse spécifique au sein des placettes*
+
+Enfin, il est intéressant de noter la répartition des individus entre les classes d'arbres. Le tableau 8 montre ainsi le nombre d'individus recensé pour chacune des espèces présentes dans la zone d'échantillonnage.
+
+```{r tableau abondance par espèce, echo=FALSE}
+arbres_SBL_sel <- read_csv("data_output/arbres_SBL_sel.csv")
+
+table8 <- arbres_SBL_sel %>%
+  rename(`Code d'espèce`= Label)
+knitr::kable(table8,
+ caption = "Tableau 8 : Nombre d'individus par espèce", row.names = TRUE)
+```
+
+L'analyse exploratoire des données a également permis de constater que, dans une même placette, le nombre d'individus d'une même espèce varie entre 0 et 32 individus. La figure suivante permet de représenter la distribution en classes d'abondance, toutes les espèces confondues. La fréquence témoigne du nombre de fois qu'une espèce a une abondance de X dans une placette. La classe d'abondance indiquant un effectif nul a été retirée du graphique de sorte à mieux illustrer la tendance, car la fréquence s'élevait à 4876 pour cette classe. Il est normal d'avoir autant de zéros dans notre cas, car la zone échantillonnée regroupe plusieurs communautés écoforestières différentes, ce qui garantit une composition des placettes très hétérogène.
+
+*Figure 3 : Distribution des classes d'abondance au sein des placettes forestières*
+
+## Transformation des données d'arbres
+Avant toute analyse, il faut d’abord procéder aux transformations des différents jeux de données. D’abord, les deux matrices explicatives, soit la matrice des variables topographiques et celle des traits fonctionnels foliaires, ont été centrées-réduites pour rendre leurs dimensions homogènes et, ainsi, pouvoir comparer les variables explicatives entre elles. Ensuite, avant de procéder à l’analyse de groupement, il est nécessaire de vérifier si les données brutes d’abondances requièrent une transformation. Par ailleurs, il est important de conserver les distances entre les éléments pour les analyses statistiques qui suivront. Les transformations ayant été testées sont donc toutes des transformations appropriées pour l’ordination des données de communautés, notamment parce qu’elles résultent en des distances euclidiennes. La figure 4 illustre le résultat des transformations appliquées sur les données d’abondance sur l’espèce la plus commune du jeu de données, soit le bouleau blanc (BEPA).
+
+*Figure 4 : Diagramme de boîte à moustaches des abondances transformées de l'espèce la plus commune, Betula papyrifera*
+
+À partir de ce diagramme de boîtes à moustaches, plusieurs transformations semblent être adaptées au jeu de données, soit la transformation de Hellinger, Chorde ou bien log-Chorde. Les données issues des différentes transformations ont alors été mises en relation avec les variables environnementales au moyen d’une ordination canonique afin de vérifier laquelle des transformations permet d’expliquer la plus grande proportion de la variance. Après la comparaison des R2 ajustés (*Tableau 9*), la transformation log-Chorde a été choisie pour être appliquée sur les données brutes avant les prochaines analyses, ce qui permettra de conserver les distances (euclidiennes) entre les éléments.
+
+```{r tableau transformations, echo=FALSE}
+transfo.R2aj <- read.csv("data_output/transfo.R2aj.csv") %>%
+  rename(`R2 ajusté` = "R2ajusté")
+knitr::kable(transfo.R2aj,
+ caption = "Tableau 9 : Comparaison de la proportion de la variance expliquée par les différents jeux de données transformés", row.names = FALSE, digits = 4)
+```
+
+## Groupement en communautés écoforestières
+Afin de séparer les placettes forestières en communautés, une analyse de groupement avec contrainte de contiguïté spatiale a été réalisée pour 3, 4 et 5 groupes. L’avantage de cette analyse de groupement est qu’elle permet d’identifier les groupes de placettes forestières d’une même communauté tout en considérant leur composante spatiale.
+
+Par ailleurs, les placettes forestières ont été regroupées avec la méthode de Ward en utilisant la matrice de distance euclidienne ayant subi une transformation de log-Chorde. Cette méthode de groupement agglomératif hiérarchique a pour objectif de minimiser la somme des carrés des écarts des groupes créés (Legendre et Legendre, 2012, p. 360). En d'autres termes, elle permet de créer des groupes de placettes forestières similaires en minimisant la variabilité entre les placettes dans chaque groupe.
+
+Après l’analyse de groupement avec contrainte de contiguïté spatiale, les fréquences relatives des espèces au sein de chacun des groupes sont calculées, puis transposées dans des histogrammes de sorte à déterminer les espèces dominantes et, ainsi, nommer les communautés écoforestières.
+
+## Ordination simple (analyse en composantes principales)
+Étant donné que notre jeu de données en est un d’abondances d’espèces, l’analyse en composantes principales (ACP) est appropriée pour ce travail. L’analyse des correspondances (AFC) serait, elle aussi, appropriée, mais elle donne davantage de poids aux espèces rares qu’aux espèces communes, ce qui n’est pas réellement l’objectif pour le groupement des communautés écoforestières, car celles-ci sont toujours définies en fonction des espèces les plus abondances, et non en fonction de la spécificité de certaines espèces à se retrouver dans certaines placettes écoforestières. L’ACP est donc l’ordination simple de choix. L’interprétation de l’analyse en composantes principales en cadrage 1 est particulièrement pertinente pour observer les espèces ayant contribué le plus à la formation des communautés écoforestières. De plus, en cadrage 1, les stations près les unes des autres sont similaires entre elles au niveau de leur composition en espèces d’arbres. Par ailleurs, tout comme les analyses précédentes, l’ordination est réalisée sur les données transformées à l’aide de la transformation de log-Chorde de sorte à conserver les distances entre les éléments.
+
+## Ordination canonique (analyse de redondance)
+Par la suite, afin de mettre en relation les variables topographiques (matrice explicative) ainsi que la distribution des espèces (matrice réponse) sur le territoire, une analyse de redondance (RDA), qui est une analyse canonique asymétrique, est réalisée sur les données brutes transformées (transformation de log-Chorde, comme pour l’ACP).
+
+Dans un premier temps, il est nécessaire de procéder à une sélection des variables explicatives de façon à conserver uniquement celles exerçant une influence significative sur la distribution des espèces. Une sélection ascendante (*forward selection*) est alors réalisée à l’aide de la fonction *forward.sel()* du package *adespatial* par le biais d’un test permutationnel utilisant 999 permutations.
+
+Pour ce faire, l’algorithme de cette fonction débute avec un modèle réduit, sans variable explicative. Puis, il ajoute une à une les variables de la matrice explicative au modèle, à partir duquel il procède à un test permutationnel de la statistique *F* afin de déterminer la significativité des différentes variables. Il sélectionne alors la plus significative, c’est-à-dire celle avec la *p-value* la plus faible, pour former un modèle amélioré. Il répète ensuite la même procédure en ajoutant des variables une à une  au dernier modèle créé, et ce, jusqu’à ce que toutes les variables soient ajoutées ou bien qu’aucune variable restante ne respecte le seuil de significativité établi (⍺ = 0.05).
+
+En résumé, des variables explicatives sont ajoutées au modèle tant et aussi longtemps que l’hypothèse nulle (H0) est rejetée :
+
+*H0 : La variable explicative n’influence pas significativement pas la distribution des espèces (p-value > 0.05).*\
+*H1 : La variable explicative influence significativement la distribution des espèces (p-value ≤ 0.05).*
+
+Enfin, une fois que toutes les variables explicatives significatives sont sélectionnées, il est possible de procéder à l’analyse de redondance sur ces dernières. Un test global de significativité est ensuite réalisé sur les résultats de la RDA, puis est suivi par un test des axes canoniques. Dans les deux cas, il sera question d’un test permutationnel de la statistique *F*. 
+
+Pour le test global, pour un seuil de significativité ⍺ = 0.05 : 
+
+*H0 : Il n’y a pas de relation significative entre la distribution des espèces et les variables explicatives (p-value > 0.05).*\
+*H1 : Il y a une relation significative entre la distribution des espèces et les variables explicatives (p-value ≤ 0.05).*
+
+Pour le test sur les axes principaux, pour un seuil de significativité ⍺ = 0.05 :
+
+*H0 : L’axe principal n’explique pas la distribution des espèces de façon significative (p-value > 0.05).*\
+*H1 : L’axe principal explique la distribution des espèces de façon significative (p-value ≤ 0.05).*
+
+Les représentations graphiques de l’analyse de redondance montreront les « fitted site scores », aussi appelé les « site contraints », de façon à représenter les objets dans la même dimension que les variables explicatives (Legendre & Legendre, p. 638).
+
+L’analyse de redondance permet de mettre en relation les variables explicatives et la distribution des espèces au sein des placettes, mais elle ne permet pas de considérer les structures spatiales du territoire. Pour un aperçu global des relations, cela est donc adéquat. Il est en revanche possible de pousser l’analyse plus loin en considérant des composantes spatiales de sorte à modéliser les différentes structures spatiales de ce jeu de données.
+
+## Modélisation des structures spatiales
+### Distance-based Moran’s eigenvector maps (dbMEM)
+Les différentes structures spatiales sont modélisées au moyen d’une analyse dbMEM (distance-based Moran’s eigenvector maps) sur les données brutes transformées (log-Chorde), puis détendancées (tendance linéaire significative : R2 ajusté = 0.123, p = 0.001). Ce type d’analyse est pertinent, notamment pour cartographier la variation spatiale d’un jeu de données et pour déterminer les variables influençant la composition des communautés à différentes échelles spatiales. Dans un contexte de communautés écoforestières, il est intéressant de procéder à une telle analyse multi-échelle afin d’interpréter l’origine de la formation de ces communautés: découlent-elles de facteurs environnementaux globaux ou plutôt de facteurs responsables de la présence de micro-environnements? Quels sont les facteurs régissant leur formation?
+
+Après avoir procédé au détendancage des données brutes transformées, une analyse dbMEM globale est réalisée sur les données détendancées. Celle-ci consiste en une RDA mettant en relation la distribution des espèces (matrice réponse) et les variables dbMEM (spatial eigenfunctions; matrice explicative) afin d’étudier la variation spatiale présente au sein des communautés (source). Si l’hypothèse nulle (voir H0 pour le test global dans la section sur l’ordination canonique) est rejetée lors du test global de significativité, ce qui signifierait qu’il y a une relation significative entre la distribution des espèces et les variables dbMEM (p-value ≤ 0.05), et que le R2 ajusté est considérable, il sera possible de poursuivre l’analyse dbMEM. Par ailleurs, le R2 ajusté permet d’estimer la proportion de la variation expliquée par la matrice explicative qui est, dans ce cas-ci, composée des variables dbMEM (Peres-Neto et al., 2006).
+
+À la suite de l’obtention d’un résultat significatif accompagné d’un R2 ajusté notable, il est pertinent de procéder à une sélection ascendante des variables dbMEM significatives, et ce, d’une façon similaire à celle utilisée que lors de la sélection des variables explicatives en RDA (test permutationnel, 999 permutations). Différemment, cette fois-ci, la sélection ascendante appliquée respectera le double critère d’arrêt de Blanchet et al. (2008), considérant le seuil de significativité ⍺, mais aussi le R2 ajusté du modèle constitué de l’ensemble des variables dbMEM (source). Cette sélection permet de diminuer le nombre de degrés de liberté des prochaines analyses statistiques, en plus d’éliminer les variables dbMEM n’ayant pas d’influence significative sur le modèle (source).
+
+### Interprétation de la variation spatiale
+Par la suite, un test de significativité (voir H0 et H1 pour le test sur les axes dans la section sur l’ordination canonique) peut être effectué sur les axes canoniques de sorte à ne conserver que ceux étant significatifs. Afin d’interpréter la variation spatiale de chacun des axes principaux, une ordination de ceux-ci sur les variables topographiques est réalisée, encore une fois à l’aide d’une sélection ascendante des variables explicatives (*forward.sel()*), permettant alors l’identification des variables topographiques responsables de la variation spatiale de chacun des axes principaux. L’avantage d’utiliser la fonction *forward.sel()* pour obtenir les variables significatives au lieu de procéder à une régression à l’aide de la fonction *lm()* est qu’elle procède à un test permutationnel, et non paramétrique, ce qui fait en sorte qu’il n’est pas nécessaire de procéder à des tests de normalité des résidus au préalable (source).
+
+### Séparation des dbMEM en différentes échelles spatiales
+Après coup, il est intéressant de pousser l’analyse spatiale encore plus loin en séparant les variables dbMEM significatives en sous-modèles représentant différentes échelles spatiales. Cette séparation est réalisée par l’analyse visuelle d’un scalogramme. Une fois que les variables dbMEM sont séparées, des RDAs sont réalisées sur chaque sous-groupe de variables afin de modéliser les structures spatiales respectives à chacune des échelles spatiales. 
+
+### Partitionnement de la variance
+Une fois que les variables significatives sont sélectionnées pour chacune des échelles spatiales, un partitionnement de la variation permet de connaître dans quelles proportions chacune des variables influence la distribution des espèces d’arbres.
+
+## Fourth corner approach - RLQ
+[En attente de voir si je coupe cette partie.]
+
+# Résultats
+## Analyse exploratoire des données
+
+
+## Groupement en communautés écoforestières
+L’analyse de groupement avec contrainte de contiguïté spatiale a permis de réaliser des groupements en 3, 4 et 5 communautés écoforestières en prenant en considération la proximité des placettes entre elles. La Figure X permet de constater les trois cartes de liens de connexité qui ont pu être réalisées selon Guénard & Legendre (2022) et Legendre & Legendre (2012, p. 843).
+
+*Figure X : Groupements en 3, 4 et 5 communautés*
+
+À la suite de l’examen des histogrammes des surfaces relatives (Figures A1 à A3), le choix s’est arrêté sur trois communautés, car on note beaucoup de redondance au niveau des espèces dominantes dans le cas de quatre ou cinq communautés.
+
+Les trois communautés écoforestières présentes dans la zone 1 de la Station de biologie des Laurentides sont donc une bétulaie à peuplier et érable rouge, une lariçaie à bouleau et pin blanc et une bétulaie à peuplier et pin blanc. La Figure A4 (Annexe 1) montre la répartition géographique de ces communautés dans l'aire d'étude.
+
+## Ordination simple
+Par la suite, l'ordination des stations des différentes communautés et des vecteurs-espèces responsables de la variation inter-communauté est présentée dans la Figure X. Celle-ci permet de constater que le premier axe (ACP 1) représente la plus grande source de variation, expliquant 26,98% de la variation totale entre les différentes placettes. Le deuxième axe (ACP 2) explique quant à lui 13,73% de la variation totale. Ainsi, en considérant uniquement les deux premières composantes principales, l'ordination permet de représenter 40,71% de la variation totale. Ce pourcentage est suffisamment important pour permettre d’analyser cette ordination.
+
+*Figure 8 : Analyse en composantes principales, cadrage 1*
+
+D’abord, il est possible de constater que la bétulaie à peuplier et érable rouge n’est pas bien définie dans une analyse en composantes principales considérant uniquement les deux premières dimensions. Celle-ci se confond énormément avec la bétulaie à peuplier et à pin blanc. D’ailleurs, mise à part le vecteur-espèce du sapin baumier, aucun autre vecteur-espèce ne pointe vers cette communauté de façon notable.
+
+Puis, le premier axe permet de séparer la lariçaie à bouleau et pin blanc de la bétulaie à peuplier et pin blanc; celles-ci étant clairement distinctes dans l’ACP. Plusieurs espèces influencent fortement la variation du premier axe. D’après leur composante en x, les vecteurs-espèces du sapin baumier, du thuya occidental et des épinettes pointent vers la lariçaie de façon considérable, alors que ceux de l’érable à sucre et du bouleau blanc pointent plutôt vers la bétulaie à peuplier et pin blanc. La longueur desdits vecteurs témoignent de leur grande contribution à l’axe principal. Par ailleurs, la contribution du thuya occidental est la plus importante dans la variation du premier axe.
+
+Ensuite, même si la bétulaie à peuplier et érable rouge n’est pas clairement séparée des deux autres communautés, il est tout de même possible de noter que le deuxième axe a un rôle important dans sa distinction face aux autres communautés. Alors que presque toutes les placettes de cette première communauté se situent au-dessus de l’axe des abscisses, celles des autres communautés ne sont pas aussi clairement agglomérées en fonction du deuxième axe. Les vecteurs-espèces contribuant de façon importante à la formation du deuxième axe sont, dans un premier temps, ceux représentant le sapin baumier et l’érable rouge, et dans un deuxième temps, celui du peuplier à grandes dents.
+
+## Ordination canonique
+Les résultats de la sélection ascendante des variables topographiques sont présentés dans le Tableau X. D’après le test permutationnel effectué, les variables significatives sont: la pente, l’élévation, l’exposition Nord-Sud, l’indice d’humidité topographique et l’exposition Est-Ouest.
+
+```{r tableau selection variables, echo=FALSE}
+sel.variables <- read.csv("data_output/sel.var.csv") %>%
+  rename(`Variables` = "variables",
+         `Ordre` = "order",
+         `R2 cumulé` = "R2Cum",
+         `R2 ajusté cumulé` = "AdjR2Cum",
+         `p-value` = "pvalue",)
+knitr::kable(sel.variables,
+ caption = "Tableau 10 : Variables topographiques sélectionnées au moyen d'une sélection ascendante", row.names = FALSE, digits = 4)
+```
+
+Par la suite, le test global de significativité réalisé sur l’analyse de redondance mettant en relation ces variables et la répartition des espèces au sein des placettes s’est avéré significatif (R2 ajusté: 0.139, p-value < 0.001). L’hypothèse nulle a donc pu être rejetée, signifiant qu’il a bel et bien une relation significative entre la distribution des espèces et les variables explicatives sélectionnées. De plus, sur cinq axes principaux, quatre d’entre eux se sont avérés être significatifs au seuil de significativité ⍺ = 0,05.
+
+En revanche, considérant que la RDA n’explique que 13,9% de la variance présente dans les données, puis qu’une représentation en deux dimensions à l’aide des deux premiers axes n’en représenterait que 12.05%, une interprétation de la Figure A5 pourrait mener à des conclusions erronées.
+
+## Modélisation des structures spatiales
+Une fois l’analyse dbMEM globale réalisée sur les données détendancées des espèces, le test global de significativité a montré une relation significative entre la distribution des espèces et les variables dbMEM (R2 ajusté: 0.510, p = 0.001). Une sélection ascendante des variables dbMEM a alors pu être réalisée, menant à une sélection de 98 variables sur un total de 199. Après coup, une deuxième analyse dbMEM globale a été réalisée, cette fois sur ce modèle réduit, résultant en un R2 ajusté de 0.475. Le R2 ajusté indique qu’avec un modèle réduit formé de 98 variables dbMEM, 47.5% de la variation présente dans la distribution des espèces peut être expliqué par les variables dbMEM.
+
+Par la suite, un test de significativité sur les différents axes individuels a révélé que sept d’entre eux sont significatifs, expliquant 41.95% de la variance totale à eux seuls. La Figure A6 présentée en annexe montre les « fitted site scores » des axes significatifs, représentant ainsi la structure spatiale responsable de la variance dans le jeu de données d’espèces. Cependant, puisque 98 variables dbMEM sont illustrées, il est pratiquement impossible d’interpréter cette figure. Or, après avoir procédé à une ordination de chacun des axes canoniques significatifs sur les variables topographiques, le Tableau X pu être construit afin de mettre en évidence les variables responsables de la variance spatiale au sein de chacun des axes individuels.
+
+*Tableau X: Variables topographiques responsables de la variance spatiale au sein des sept axes canoniques significatifs au niveau de la structure spatiale de la répartition des espèces.*
+
+Ensuite, les variables dbMEM ont été séparées en quatres échelles spatiales grâce à l’analyse visuelle du scalogramme. Effectivement, un certain patron peut être constaté sur ce dernier, représenté à la Figure X. Les quatres échelles spatiales sont: broad-scale (1-14), medium-scale (15-63), fine-scale (68-115), very fine-scale (121-200).
+
+*Figure X: Scalogramme de la variance expliquée par l’ensemble des variables dbMEM.*
+
+
+# Annexe 1 : Figures supplémentaires
+
+*Figure A1 : Fréquences relatives des espèces au sein des communautés, pour trois communautés*
+
+*Figure A2 : Fréquences relatives des espèces au sein des communautés, pour quatre communautés*
+
+*Figure A3 : Fréquences relatives des espèces au sein des communautés, pour cinq communautés*
+
+*Figure A4 : Distribution des communautés écoforestières*
+
+*Figure A5: Analyse de redondance, fitted site scores (lc scores)*
+a: cadrage 1; b: cadrage 2.
+
+*Figure A6 : Analyse dbMEM sur les données détendancées des espèces d’arbres.*
+Les 98 variables dbMEM retenues par sélection ascendante y sont présentes. Les sept axes principaux sont représentés en cadrage 1, illustrant les « fitted site scores ».
+
+*Figure A7 : Les six variables dbMEM significatives à grande échelle*
+
+*Figure A8 : Les trois variables dbMEM significatives à moyenne échelle*
+
+*Figure A9 : La seule variable dbMEM significative à échelle fine (gauche) et très fine (droite).*

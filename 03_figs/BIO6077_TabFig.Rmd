@@ -1,0 +1,228 @@
+---
+title: "Liste des tableaux et figures"
+author: "Ariane Roberge"
+date: "`r Sys.Date()`"
+output:
+  word_document: 
+    reference_docx: texte_modele.docx
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  comment = "#",
+  #collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  #cache = TRUE,
+  fig.width=7, fig.height=5, fig.retina=3
+  #fig.align = 'center' # not supported for docx output
+)
+```
+
+```{r pander, warning=FALSE, echo=FALSE}
+# set pander table-layout options
+library(pander)
+panderOptions('table.alignment.default', function(df)
+    ifelse(sapply(df, is.numeric), 'right', 'left'))
+panderOptions('table.split.table', Inf)
+panderOptions('big.mark', ",")
+panderOptions('keep.trailing.zeros', TRUE)
+```
+
+```{r Importation des packages, echo=FALSE}
+library(sf)
+library(esri2sf)
+library(tidyverse)
+```
+
+# Introduction
+## Contexte et problématique
+
+# Matériel
+## Lieu d'étude
+
+```{r Liste espèces, echo=FALSE}
+# Fichier différent de especes.txt, car PIMA, PIRU, PIGL n'ont pas été changés en Picea.
+especes_tab <- read.table('data_input/especes_tab.txt', header = TRUE, sep = ";") %>%
+  rename(`Nom scientifique (latin)` = 'scientific_name',
+         `Code d'espèce` = 'codesp')
+knitr::kable(especes_tab,
+ caption = "Tableau 1 : Espèces présentes à la Station de biologie des Laurentides")
+```
+
+## Plan d'échantillonnage
+
+## Tableaux de données
+### Arbres inventoriés
+
+```{r Importation et nettoyage des données darbres, echo=FALSE}
+#### Importation et nettoyage des données d'arbres (type sf) ----
+Z1_polygones <- read_sf("data_input/Z1_polygones.geojson") %>% # on lit le fichier
+  st_transform(2950) %>% # on transforme au code 2950
+  select(OBJECTID, Label, surf_m2) %>% # on sélectionne les variables pertinentes
+  filter(Label != 'Mort' & Label != 'Acer' & Label != 'Populus' & Label != 'Feuillus' & Label != 'Conifere' & Label != 'Betula' & Label != 'PRPE') # on enlève les classes non représentatives
+
+# Regroupement de tous les Picea dans une même classe
+Z1_polygones$Label[Z1_polygones$Label %in% c("PIGL","PIRU","PIMA")] <- "Picea" 
+```
+
+```{r Visualisation tableau Z1_polygones, echo=FALSE}
+table2 <- head(Z1_polygones) %>%
+  rename('Superficie' = 'surf_m2',
+         `Code d'espèce` = 'Label',
+         'Géométrie' = geometry)
+knitr::kable(table2,
+ caption = "Tableau 2 : Polygones des arbres inventoriés dans la zone 1")
+```
+
+### Placettes forestières
+
+```{r Visualisation tableau grid_coord, echo=FALSE}
+table3 <- read.csv("data_output/grid_coord.csv") %>%
+  rename("X (m)" = X,
+         "Y (m)" = Y)
+table3 <- table3[, c(3, 1, 2)] #On réordonne le dataframe pour avoir le grid_id en 1ère colonne
+knitr::kable(head(table3),
+ caption = "Tableau 3 : Placettes forestières")
+```
+
+### Abondances d’espèces d’arbres
+
+```{r Visualisation tableau spe, echo=FALSE}
+table4 <- read.csv("data_output/spe.csv", row.names=1)
+knitr::kable(head(table4),
+ caption = "Tableau 4 : Composition des placettes forestières", row.names = TRUE)
+```
+
+### Variables topographiques
+
+```{r Visualisation tableau grid_topo, echo=FALSE}
+# Importation des placettes forestières avec var. environnementales
+table5 <- read_sf("data_output/grid_topo.geojson") # on lit le fichier
+
+table5 <- table5[, c(1, 6, 5, 7, 10, 11)] %>% #On réordonne le dataframe pour avoir le grid_id en 1ère colonne
+  st_drop_geometry() %>%
+  rename(Pente = slope,
+         Élévation = elev_mnt,
+         `Indice d'humidité topographique` = twi,
+         'Eastness exposure' = eastness_exp,
+         'Northness exposure' = northness_exp)
+
+knitr::kable(head(table5),
+ caption = "Tableau 5 : Variables topographiques relatives à chacune des placettes forestières")
+```
+
+### Traits fonctionnels des arbres
+
+```{r Visualisation tableau traits, echo=FALSE}
+sp_rares <- c('FRNI', 'POBA', 'POTR', 'QURU')
+
+spe.traits <- read.csv("traits_output/traits_short.csv", row.names=1) # rn pour rownames (garde les grid_id)
+
+spe.traits.sel <- spe.traits[!(row.names(spe.traits) %in% sp_rares),] # On enlève les espèces rares
+
+table6 <- spe.traits.sel %>%
+  rename('C:N' = 'C.N',
+         'Carot:Chltot' = 'Carot.Chltot',
+         'Chla:Chlb' = 'Chla.Chlb')
+knitr::kable(table6,
+ caption = "Tableau 6 : Moyennes des traits fonctionnels foliaires par espèce", digits = 2)
+
+x <- table6[2:8]
+traits_stat <- data.frame('Moyenne' = apply(x, 2, mean, na.rm = TRUE),
+                          'Écart-type' = apply(x, 2, sd, na.rm = TRUE),
+                          'Étendue' = apply(x, 2, max, na.rm = TRUE)-apply(x, 2, min, na.rm = TRUE),
+                          'Cov' = (apply(x, 2, sd, na.rm = TRUE)/apply(x, 2, mean, na.rm = TRUE))*100) %>%
+  t() %>% # transposer le tableau
+  as.data.frame()
+
+knitr::kable(traits_stat,
+ caption = "Tableau 7 : Statistiques sur les moyennes des traits fonctionnels foliaires", digits = 2)
+```
+
+# Méthodes
+## Analyse exploratoire des données
+
+![Figure 1 : Occurrences et fréquences relatives des espèces](figures/hist_freq.png)
+
+
+![Figure 2 : Abondance et richesse spécifique au sein des placettes forestières](figures/nb_sp_nb_ind.png)
+
+```{r tableau abondance par espèce, echo=FALSE}
+arbres_SBL_sel <- read_csv("data_output/arbres_SBL_sel.csv")
+
+table8 <- arbres_SBL_sel %>%
+  rename(`Code d'espèce`= Label)
+knitr::kable(table8,
+ caption = "Tableau 8 : Nombre d'individus par espèce inventoriée", row.names = TRUE)
+```
+
+![Figure 3 : Distribution des classes d'abondance au sein des placettes forestières](figures/classes_abondance.png)
+
+
+## Transformation des données d'arbres
+
+![Figure 4 : Diagramme de boîte à moustaches des abondances transformées de l'espèce la plus commune, Betula papyrifera](figures/transfo.png)
+
+```{r tableau transformations, echo=FALSE}
+transfo.R2aj <- read.csv("data_output/transfo.R2aj.csv") %>%
+  rename(`R2 ajusté` = "R2ajusté")
+knitr::kable(transfo.R2aj,
+ caption = "Tableau 9 : Comparaison de la proportion de la variance expliquée par les différents jeux de données transformés", row.names = FALSE, digits = 4)
+```
+
+## Groupement en communautés écoforestières
+
+![3comm](figures/carte_liens3_logchord.png)![4comm](figures/carte_liens4_logchord.png)
+
+![Figure 5 : Groupements en 3, 4 et 5 communautés écoforestières](figures/carte_liens5_logchord.png)
+
+## Ordination simple (analyse en composantes principales)
+
+![Figure 6 : Analyse en composantes principales, cadrage 1](figures/ACP_3comm.png)
+
+## Ordination canonique (analyse de redondance)
+```{r tableau selection variables, echo=FALSE}
+sel.variables <- read.csv("data_output/sel.var.csv") %>%
+  rename(`Variables` = "variables",
+         `Ordre` = "order",
+         `R2 cumulé` = "R2Cum",
+         `R2 ajusté cumulé` = "AdjR2Cum",
+         `p-value` = "pvalue",)
+knitr::kable(sel.variables,
+ caption = "Tableau 10 : Variables topographiques sélectionnées au moyen d'une sélection ascendante", row.names = FALSE, digits = 4)
+```
+
+## Modélisation des structures spatiales
+### Distance-based Moran’s eigenvector maps (dbMEM)
+### Interprétation de la variation spatiale
+### Séparation des dbMEM en différentes échelles spatiales
+
+![Figure 9 : Scalogramme de la variance expliquée par l'ensemble des variables dbMEM](figures/scalogram.png)
+![Figure 10 : Les 6 variables dbMEM significatives at a broad scale](figures/dbMEM_broadscale.png)
+![Figure 11 : Les 3 variables dbMEM significatives at a medium scale](figures/dbMEM_mediumscale.png)
+
+![Figure 12 : La seule variable dbMEM significative at a fine scale](figures/dbMEM_finescale.png)
+
+![Figure 13 : La seule variable dbMEM significative at a very fine scale](figures/dbMEM_veryfinescale.png)
+
+### Partitionnement de la variance
+![Figure 14 : Partitionnement de la variance](figures/dbMEM_varpart.png)
+
+## Fourth corner approach - RLQ
+![Figure 15 : Résultats des tests de la méthode Fourth-corner](figures/fourth-corner_analysis_mod2.png)
+
+# Annexe 1 : Figures supplémentaires
+![Figure A1 : Fréquences relatives des espèces au sein des communautés, pour trois communautés](figures/graph_comm3.png)
+
+![Figure A2 : Fréquences relatives des espèces au sein des communautés, pour quatre communautés](figures/graph_comm4.png)
+
+
+![Figure A3 : Fréquences relatives des espèces au sein des communautés, pour cinq communautés](figures/graph_comm5.png)
+
+![Figure A4 : Distribution des communautés écoforestières](figures/carte_3comm.png)
+
+![Figure A5 : Analyse de redondance. a: cadrage 1; b: cadrage 2. Fitted site scores (lc scores).](figures/RDA_triplot.rda.lc.png)
+
+![Figure A6 : Analyse dbMEM sur les données détendancées des espèces d’arbres. Les 98 variables dbMEM retenues par sélection ascendante y sont présentes. Les sept axes principaux sont représentés en cadrage 1, illustrant les « fitted site scores ».](figures/dbMEM_analysis.png)
