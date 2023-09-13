@@ -3,12 +3,13 @@
 # and export clean data between each one.
 
 #### Importation des packages ----
+library(tidyverse)
 library(sf)
 #library(esri2sf)
-library(tidyverse)
+
 
 #### Importation et nettoyage des données d'arbres (type sf) ----
-Z1_polygones <- read_sf("data_input/Z1_polygones.geojson") %>% # on lit le fichier
+Z1_polygones <- read_sf("00_rawdata/Z1_polygones.geojson") %>% # on lit le fichier
   st_transform(2950) %>% # on transforme au code 2950
   select(OBJECTID, Label, surf_m2) %>% # on sélectionne les variables pertinentes
   filter(Label != 'Mort' & Label != 'Acer' & Label != 'Populus' & Label != 'Feuillus' & Label != 'Conifere' & Label != 'Betula' & Label != 'PRPE') # on enlève les classes non représentatives
@@ -94,9 +95,9 @@ grid <- grid %>%
 
 #### Exportation de grid en GEOJSON et de grid_coord en csv ----
 # à décommenter lorsqu'on roule le code pour la première fois
-st_write(grid, dsn = "data_output/grid.geojson", driver = "GeoJSON") ## package sf
-st_write(grid, dsn = "data_output/grid.shp") ## package sf
-write.csv(grid_coord,"data_output/grid_coord.csv", row.names = FALSE)
+st_write(grid, dsn = "02_outdata/grid.geojson", driver = "GeoJSON") ## package sf
+#st_write(grid, dsn = "02_outdata/grid.shp") ## package sf
+write.csv(grid_coord,"02_outdata/grid_coord.csv", row.names = FALSE)
 
 #### Sélection des arbres se trouvant dans les placettes sélectionnées ----
 # Filtrage les données d'arbres pour conserver uniquement les individus dans les placettes sélectionnées ----
@@ -110,7 +111,7 @@ arbres_cent_sel <- Z1_polygones %>%
 # Jointure de table avec Z1_polygones pour conserver uniquement les arbres dont le centroïde se trouve à l'intérieur d'une placette
 arbres_poly_sel <- right_join(Z1_polygones, arbres_cent_sel)
 head(arbres_poly_sel)
-st_write(arbres_poly_sel, dsn = "data_output/arbres_poly_sel.shp") ## package sf
+st_write(arbres_poly_sel, dsn = "02_outdata/arbres_poly_sel.shp") ## package sf
 
 #### Superficies de la canopée ----
 # ? ATTENTION: Répétition des calculs de superficie avec la section : Sélection des placettes comportant SUFFISAMMENT d'annotations
@@ -130,7 +131,7 @@ surfs <- surfs %>% # on part du tableau précédent
   mutate(surf_rel = sum_surf_m2_ha / sum(sum_surf_m2_ha)) # on calcule la superficie de canopée relative de chaque espèce par placette
 surfs$grid_id <- as.character(surfs$grid_id)
 
-write.csv(surfs,"data_output/surfs.csv", row.names = FALSE)
+write.csv(surfs,"02_outdata/surfs.csv", row.names = FALSE)
 
 #On peut aussi calculer la superficie de la canopée présente, toutes espèces confondues.
 #Une forêt mature peut avoir jusqu'à 100% de sa surface recouverte par une canopée.
@@ -148,7 +149,7 @@ arbres_SBL_sel <- st_drop_geometry(arbres_poly_sel) %>%
   count(.)
 arbres_SBL_sel
 
-write.csv(arbres_SBL_sel,"data_output/arbres_SBL_sel.csv", row.names = FALSE)
+write.csv(arbres_SBL_sel,"02_outdata/arbres_SBL_sel.csv", row.names = FALSE)
 
 #### Graphique des placettes forestières sélectionnées avec polygones ----
 # plot(st_geometry(grid), border = 'red')
@@ -176,4 +177,4 @@ spe <- arbres_large %>% # on part des données en format large
 rownames(spe) <- grid_id # on utilise les grid_id comme noms de lignes
 head(spe) # format "large" corrigé et transformé en matrix avec nom
 
-write.csv(spe,"data_output/spe.csv", row.names = TRUE)
+write.csv(spe,"02_outdata/spe.csv", row.names = TRUE)

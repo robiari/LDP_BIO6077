@@ -5,28 +5,28 @@ library(tidyverse)
 library(stars)
 library(sf)
 library(starsExtra)
-#library(circular)
+library(circular)
 library(dplyr)
 
 #### Importation des données ----
 # Polygones des placettes forestières ----
-grid <- read_sf("data_output/grid.geojson") %>% # on lit le fichier
+grid <- read_sf("02_outdata/grid.geojson") %>% # on lit le fichier
   st_transform(2950) # on transforme au code 2950
 
 # Zone d’échantillonnage ----
-zone <- read_sf("data_input/Z1.geojson") %>% # on lit le fichier
+zone <- read_sf("00_rawdata/Z1.geojson") %>% # on lit le fichier
   st_geometry() %>% # on ne garde que la géométrie
   st_transform(2950) # on transforme au code 2950
 
 # MNT ----
-mnt <- read_stars('lidar_data/mnt_2950.tif',  # on pointe vers le fichier ## package stars
+mnt <- read_stars('00_rawdata/mnt_2950.tif',  # on pointe vers le fichier ## package stars
                   proxy = TRUE) %>% # proxy = TRUE pour ne pas charger le fichier au complet dans votre mémoire vive
   st_crop(zone) %>% # on extrait la zone du Lac Croche
   st_as_stars() # on convertit au format stars
 
 st_crs(mnt)$epsg # 2950
 
-png("figures/mnt.png",
+png("03_figs/mnt.png",
     height = 8, width = 8, # taille
     units = "in", # unités
     res = 300) # résolution
@@ -35,14 +35,14 @@ plot(st_geometry(grid), add = TRUE) # on ajoute les placettes
 dev.off()
 
 # Pentes ----
-pentes <- read_stars('lidar_data/pentes_2950.tif',  # on pointe vers le fichier
+pentes <- read_stars('00_rawdata/pentes_2950.tif',  # on pointe vers le fichier
                      proxy = TRUE) %>% # proxy = TRUE pour ne pas charger le fichier au complet dans votre mémoire vive
   st_crop(zone) %>% # on extrait la zone du Lac Croche
   st_as_stars() # on convertit au format stars
 
 st_crs(pentes)$epsg # 2950
 
-png("figures/pentes.png",
+png("03_figs/pentes.png",
     height = 8, width = 8, # taille
     units = "in", # unités
     res = 300) # résolution
@@ -56,7 +56,7 @@ slope_deg <- slope(mnt) # package starsExtra
 plot(slope_deg, col = terrain.colors(10), reset = FALSE) # on inspecte le résultat en couleur
 plot(st_geometry(grid), add = TRUE) # on ajoute les placettes
 
-png("figures/slope_deg.png",
+png("03_figs/slope_deg.png",
     height = 8, width = 8, # taille
     units = "in", # unités
     res = 300) # résolution
@@ -69,7 +69,7 @@ dev.off()
 
 slope_pourc <- (100*slope_deg)/90
 
-png("figures/slope_pourc.png",
+png("03_figs/slope_pourc.png",
     height = 8, width = 8, # taille
     units = "in", # unités
     res = 300) # résolution
@@ -82,7 +82,7 @@ dev.off()
 northness <- cos(aspect(mnt) * pi / 180) 
 eastness <- sin(aspect(mnt) * pi / 180)
 
-png("figures/northness.png",
+png("03_figs/northness.png",
     height = 8, width = 8, # taille
     units = "in", # unités
     res = 300) # résolution
@@ -90,7 +90,7 @@ plot(northness, col = heat.colors(20), main = "northness", reset = FALSE) # on i
 plot(st_geometry(grid), add = TRUE) # on ajoute les placettes
 dev.off()
 
-png("figures/eastness.png",
+png("03_figs/eastness.png",
     height = 8, width = 8, # taille
     units = "in", # unités
     res = 300) # résolution
@@ -107,7 +107,7 @@ slope_rad <- (slope_deg*pi)/180
 northness_exposure = sin(slope_rad)*northness
 eastness_exposure = sin(slope_rad)*eastness
 
-png("figures/northness_exposure.png",
+png("03_figs/northness_exposure.png",
     height = 8, width = 8, # taille
     units = "in", # unités
     res = 300) # résolution
@@ -115,7 +115,7 @@ plot(northness_exposure, col = heat.colors(20), main = "northness exposure", res
 plot(st_geometry(grid), add = TRUE) # on ajoute les placettes
 dev.off()
 
-png("figures/eastness_exposure.png",
+png("03_figs/eastness_exposure.png",
     height = 8, width = 8, # taille
     units = "in", # unités
     res = 300) # résolution
@@ -124,14 +124,14 @@ plot(st_geometry(grid), add = TRUE) # on ajoute les placettes
 dev.off()
 
 # Indice d'humidité topographique ----
-twi <- read_stars('lidar_data/twi_2950.tif',  # on pointe vers le fichier
+twi <- read_stars('00_rawdata/twi_2950.tif',  # on pointe vers le fichier
                      proxy = TRUE) %>% # proxy = TRUE pour ne pas charger le fichier au complet dans votre mémoire vive
   st_crop(zone) %>% # on extrait la zone du Lac Croche
   st_as_stars() # on convertit au format stars
 
 st_crs(twi)$epsg # 2950
 
-png("figures/twi.png",
+png("03_figs/twi.png",
     height = 8, width = 8, # taille
     units = "in", # unités
     res = 500) # résolution
@@ -140,7 +140,7 @@ plot(st_geometry(grid), add = TRUE) # on ajoute les placettes
 dev.off()
 
 #### Extraire des données pour plusieurs polygones ####
-source("functions/extr_rast_stat.R") # inclut le package circular
+source("01_scripts/r_functions/extr_rast_stat.R") # inclut le package circular
 # MNT ----
 mnt_moy <- vector() # On crée un vecteur vide pour stocker les résultats de la boucle
 for (i in 1:nrow(grid)) { # se lit: pour chaque élément i allant de 1 jusqu'à n = nombre de placettes)
@@ -294,44 +294,42 @@ carte_twi <- tm_shape(grid_topo) +
 (carte_east_north_exp <- tmap_arrange(carte_eastness_exp, carte_northness_exp, ncol = 2))
 
 tmap_save(tm = carte_slope, # objet tmap qu'on veut enregistrer
-          filename = "figures/carte_slope.png", # nom et chemin du fichier qu'on enregistre, incluant l'extension
+          filename = "03_figs/carte_slope.png", # nom et chemin du fichier qu'on enregistre, incluant l'extension
           height = 4, # hauteur de la carte
           width = 4, # largeur de la carte
           units = "in", # unités utilisées pour la hauteur et la largeur
           dpi = 300) # par défault dpi = 300, on augmente pour une meilleure résolution
 
 # tmap_save(tm = carte_pente_slope, # objet tmap qu'on veut enregistrer
-#           filename = "figures/carte_pente_slope.png", # nom et chemin du fichier qu'on enregistre, incluant l'extension
+#           filename = "03_figs/carte_pente_slope.png", # nom et chemin du fichier qu'on enregistre, incluant l'extension
 #           height = 4, # hauteur de la carte
 #           width = 8, # largeur de la carte
 #           units = "in", # unités utilisées pour la hauteur et la largeur
 #           dpi = 300) # par défault dpi = 300, on augmente pour une meilleure résolution
 
 tmap_save(tm = carte_mnt_twi, # objet tmap qu'on veut enregistrer
-          filename = "figures/carte_mnt_twi.png", # nom et chemin du fichier qu'on enregistre, incluant l'extension
+          filename = "03_figs/carte_mnt_twi.png", # nom et chemin du fichier qu'on enregistre, incluant l'extension
           height = 4, # hauteur de la carte
           width = 8, # largeur de la carte
           units = "in", # unités utilisées pour la hauteur et la largeur
           dpi = 300) # par défault dpi = 300, on augmente pour une meilleure résolution
 
-
-
 tmap_save(tm = carte_east_north, # objet tmap qu'on veut enregistrer
-          filename = "figures/carte_east_north.png", # nom et chemin du fichier qu'on enregistre, incluant l'extension
+          filename = "03_figs/carte_east_north.png", # nom et chemin du fichier qu'on enregistre, incluant l'extension
           height = 4, # hauteur de la carte
           width = 8, # largeur de la carte
           units = "in", # unités utilisées pour la hauteur et la largeur
           dpi = 300) # par défault dpi = 300, on augmente pour une meilleure résolution
 
 tmap_save(tm = carte_east_north_exp, # objet tmap qu'on veut enregistrer
-          filename = "figures/carte_east_north_exp.png", # nom et chemin du fichier qu'on enregistre, incluant l'extension
+          filename = "03_figs/carte_east_north_exp.png", # nom et chemin du fichier qu'on enregistre, incluant l'extension
           height = 4, # hauteur de la carte
           width = 8, # largeur de la carte
           units = "in", # unités utilisées pour la hauteur et la largeur
           dpi = 300) # par défault dpi = 300, on augmente pour une meilleure résolution
 
 #### Exportation de grid_topo en GEOJSON ----
-st_write(grid_topo, dsn = "data_output/grid_topo.geojson", driver = "GeoJSON") ## package sf
+st_write(grid_topo, dsn = "02_outdata/grid_topo.geojson", driver = "GeoJSON") ## package sf
 
 #### Édition du fichier grid_topo pour le faire fonctionner avec les analyses ----
 grid.env <- grid_topo %>%
@@ -342,7 +340,7 @@ rownames(grid.env) <- grid.env$grid_id # on utilise la colonne grid_id comme row
 ncol(grid.env)
 grid.env <- grid.env[4:ncol(grid.env)]
 
-write.csv(grid.env,"data_output/grid.env.csv", row.names = TRUE)
+write.csv(grid.env,"02_outdata/grid.env.csv", row.names = TRUE)
 
 ## Corrélation des variables environnementales ----
 grid.env.cor = cor(grid.env, method = c("spearman"))
@@ -350,7 +348,7 @@ grid.env.cor = cor(grid.env, method = c("spearman"))
 library("Hmisc")
 library("corrplot")
 
-png("figures/corrplot_env.png",
+png("03_figs/corrplot_env.png",
     height = 6, width = 6, # taille
     units = "in", # unités
     res = 300) # résolution
@@ -369,7 +367,7 @@ dev.off()
 grid.env2 <- grid.env %>%
   select(-c(pentes, eastness, northness))
 
-write.csv(grid.env2,"data_output/grid.env2.csv", row.names = TRUE)
+write.csv(grid.env2,"02_outdata/grid.env2.csv", row.names = TRUE)
 
 
 # Statistiques sur les variables topographiques ----
