@@ -1,4 +1,19 @@
-.Rproj.user
+
+# History files
 .Rhistory
+.Rapp.history
+
+# Session Data files
 .RData
+
+# User-specific files
 .Ruserdata
+.Rproj.user
+.Rprofile
+
+# Datasets
+00_rawdata/
+02_outdata/
+
+# Figures
+03_figs

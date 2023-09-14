@@ -247,10 +247,6 @@ plot(grid_topo[9:12])
 par(mfrow = c(1,1)) # on remet à 1:1
 # Création des cartes choroplètes
 library(tmap)
-# carte_pente <- tm_shape(grid_topo) +
-#   tm_fill(col = "pentes",
-#           title = "Pentes (LiDAR) (%)") +
-#   tm_borders() 
 
 carte_slope <- tm_shape(grid_topo) +
   tm_fill(col = "slope",
@@ -289,7 +285,6 @@ carte_twi <- tm_shape(grid_topo) +
   tm_borders()
 
 (carte_mnt_twi <- tmap_arrange(carte_elev_mnt, carte_twi, ncol = 2))
-#(carte_pente_slope <- tmap_arrange(carte_pente, carte_slope, ncol = 2))
 (carte_east_north <- tmap_arrange(carte_eastness, carte_northness, ncol = 2))
 (carte_east_north_exp <- tmap_arrange(carte_eastness_exp, carte_northness_exp, ncol = 2))
 
@@ -299,13 +294,6 @@ tmap_save(tm = carte_slope, # objet tmap qu'on veut enregistrer
           width = 4, # largeur de la carte
           units = "in", # unités utilisées pour la hauteur et la largeur
           dpi = 300) # par défault dpi = 300, on augmente pour une meilleure résolution
-
-# tmap_save(tm = carte_pente_slope, # objet tmap qu'on veut enregistrer
-#           filename = "03_figs/carte_pente_slope.png", # nom et chemin du fichier qu'on enregistre, incluant l'extension
-#           height = 4, # hauteur de la carte
-#           width = 8, # largeur de la carte
-#           units = "in", # unités utilisées pour la hauteur et la largeur
-#           dpi = 300) # par défault dpi = 300, on augmente pour une meilleure résolution
 
 tmap_save(tm = carte_mnt_twi, # objet tmap qu'on veut enregistrer
           filename = "03_figs/carte_mnt_twi.png", # nom et chemin du fichier qu'on enregistre, incluant l'extension
