@@ -111,7 +111,7 @@ arbres_cent_sel <- Z1_polygones %>%
 # Jointure de table avec Z1_polygones pour conserver uniquement les arbres dont le centroïde se trouve à l'intérieur d'une placette
 arbres_poly_sel <- right_join(Z1_polygones, arbres_cent_sel)
 head(arbres_poly_sel)
-st_write(arbres_poly_sel, dsn = "02_outdata/arbres_poly_sel.shp") ## package sf
+# st_write(arbres_poly_sel, dsn = "02_outdata/arbres_poly_sel.shp") ## package sf
 
 #### Superficies de la canopée ----
 # ? ATTENTION: Répétition des calculs de superficie avec la section : Sélection des placettes comportant SUFFISAMMENT d'annotations
