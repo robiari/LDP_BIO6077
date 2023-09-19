@@ -1,0 +1,66 @@
+---
+title: "Testing the grateful package"
+output: pdf_document
+date: "2022-09-22"
+bibliography: ["test.bib", "grateful-refs.bib"]
+csl: ecology-letters.csl
+#csl: "https://raw.githubusercontent.com/citation-style-language/styles/master/ecology-letters.csl"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load libraries
+
+Let's load libraries.
+
+```{r loadlib, message = FALSE}
+library(janitor)
+library(tidyverse)
+library(palmerpenguins)
+library(grateful)
+```
+
+let's now create a BibTex file that includes citations for these libraries.
+
+```{r}
+get_pkgs_info()
+```
+
+And that function automatically produces a .bib file called "grateful-refs.bib". So we'll add that to our YAML.
+
+## Tables and Plots
+
+I'll use the [@mouillotDimensionalityStructureSpecies2021] a lot in my writing. I want to add another citation here [@denelleDistinguishingSignaturesLocal2019].
+
+And here i'd like to use the `palmerpenguins` package
+
+```{r crosstab}
+
+penguins %>%
+  tabyl(species, island) %>%
+  adorn_totals(where = c("row", "col"))
+
+```
+
+Now a figure
+
+```{r}
+penguins %>% 
+  filter(sex == "male") %>%
+  ggplot(aes(x = species, y = body_mass_g)) +
+  geom_violin() +
+  geom_jitter(size = 2, shape = 1, width = 0.1) +
+  xlab("Species") +
+  ylab("Body mass (g)") +
+  theme_bw()
+```
+
+```{r results = 'asis'}
+cite_packages(output = "paragraph")
+```
+
+\newpage
+
+## References

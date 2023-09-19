@@ -91,7 +91,7 @@ apply(spe, 2, range)
 ab_nozero <- ab[2:30]
 
 # Barplot of the distribution, all species confounded
-png("figures/classes_abondance_avec0.png", height = 4, width = 5, 
+png("03_figs/classes_abondance_avec0.png", height = 4, width = 5, 
     units = "in", # unités
     res = 300) # résolution
 barplot(ab,
@@ -104,7 +104,7 @@ dev.off()
 
 # La classe d'abondance comptant les zéros a été enlevée afin de permettre d'avoir une meilleure idée de la répartition des classes d'abondance.
 # Il y avait 6075 zéros dans la table de données.
-png("figures/classes_abondance.png", height = 4, width = 5, 
+png("03_figs/classes_abondance.png", height = 4, width = 5, 
     units = "in", # unités
     res = 300) # résolution
 barplot(ab_nozero,
@@ -132,7 +132,7 @@ round(sort(spe.relf), 1) # Round the sorted output to 1 digit
 
 # Plot the histograms
 # Enregistrement de la figure
-png("figures/hist_freq.png", height = 4, width = 8, 
+png("03_figs/hist_freq.png", height = 4, width = 8, 
     units = "in", # unités
     res = 300) # résolution
 
@@ -164,7 +164,7 @@ dev.off()
 # Les distances de Hellinger et de chorde sont appropriées pour l’ordination des données de communautés
 # parce qu’elles possèdent 9 propriétés importantes pour l’étude de la diversité bêta.
 
-source('functions/box.cox.chord.R') # provient de Appendix 4 (Legendre & Borcard, 2018)
+source('01_scripts/r_functions/box.cox.chord.R') # provient de Appendix 4 (Legendre & Borcard, 2018)
 
 # Sans transformation
 spe.d <- dist(spe)
@@ -204,7 +204,7 @@ is.euclid(spe.dbc) # True
 # Boxplots of transformed abundances of a common species ----
 # (BEPA, species #3)
 # Enregistrement de la figure
-png("figures/transfo.png", height = 4, width = 8, 
+png("03_figs/transfo.png", height = 4, width = 8, 
     units = "in", # unités
     res = 300) # résolution
 par(mfrow = c(1,2))
@@ -455,9 +455,9 @@ comm5_tbl <- comm5_tbl %>% # on peut stocker les noms dans notre objet contenant
 comm5_tbl # on examine le résultat
 
 # On enregistre le fichier avec les noms des communautés
-write_csv(comm3_tbl, "data_output/comm3.csv")
-write_csv(comm4_tbl, "data_output/comm4.csv")
-write_csv(comm5_tbl, "data_output/comm5.csv")
+write_csv(comm3_tbl, "02_outdata/comm3.csv")
+write_csv(comm4_tbl, "02_outdata/comm4.csv")
+write_csv(comm5_tbl, "02_outdata/comm5.csv")
 
 # Figures des fréquences relatives (après la détermination des noms) ----
 # Pour 3 communautés (avec log-Chord) :
@@ -499,7 +499,7 @@ graph_comm3 <- ggplot(surf_moy_comm3,
 graph_comm3
 
 # Enregistrement de la figure - 3 communautés
-ggsave(graph_comm3, file = 'figures/graph_comm3.png', # nom du fichier avec extension
+ggsave(graph_comm3, file = '03_figs/graph_comm3.png', # nom du fichier avec extension
        width = 8, # largeur en pouces
        height = 3, # hauteur en pouces
        dpi = 300) # résolution en pixels par pouce
@@ -516,7 +516,7 @@ graph_comm4 <- ggplot(surf_moy_comm4,
 graph_comm4
 
 # Enregistrement de la figure - 4 communautés
-ggsave(graph_comm4, file = 'figures/graph_comm4.png', # nom du fichier avec extension
+ggsave(graph_comm4, file = '03_figs/graph_comm4.png', # nom du fichier avec extension
        width = 6, # largeur en pouces
        height = 6, # hauteur en pouces
        dpi = 300) # résolution en pixels par pouce
@@ -533,7 +533,7 @@ graph_comm5 <- ggplot(surf_moy_comm5,
 graph_comm5
 
 # Enregistrement de la figure - 5 communautés
-ggsave(graph_comm5, file = 'figures/graph_comm5.png', # nom du fichier avec extension
+ggsave(graph_comm5, file = '03_figs/graph_comm5.png', # nom du fichier avec extension
        width = 8, # largeur en pouces
        height = 6, # hauteur en pouces
        dpi = 300) # résolution en pixels par pouce
@@ -557,7 +557,7 @@ dev.off()
 
 # Importation d'une orthomosaïque
 require(stars)
-ortho <- read_stars('data_input/2021-09-28-sbl-cloutier-z1-P4RTK-MS.tif', 
+ortho <- read_stars('00_rawdata/2021-09-28-sbl-cloutier-z1-P4RTK-MS.tif', 
                     proxy = TRUE,
                     NA_value = 0) %>% # car les valeurs manquantes sont 0 dans ce raster
   st_transform(2950) # on transforme au code 2950
@@ -584,7 +584,7 @@ carte_3comm <- tm_shape(ortho, # on charge notre orthomosaïque
 #carte_3comm # on visualise le résultat
 
 tmap_save(tm = carte_3comm,
-          filename = 'figures/carte_3comm.png', # on nomme le fichier # l'extension définit le format
+          filename = '03_figs/carte_3comm.png', # on nomme le fichier # l'extension définit le format
           dpi = 600, # résolution en pixels par pouce
           width = 8) # largeur de l'image en pouces
 
@@ -605,7 +605,7 @@ carte_4comm <- tm_shape(ortho, # on charge notre orthomosaïque
 #carte_4comm # on visualise le résultat
 
 tmap_save(tm = carte_4comm,
-          filename = 'figures/carte_4comm.png', # on nomme le fichier # l'extension définit le format
+          filename = '03_figs/carte_4comm.png', # on nomme le fichier # l'extension définit le format
           dpi = 600, # résolution en pixels par pouce
           width = 8) # largeur de l'image en pouces
 
@@ -626,7 +626,7 @@ carte_5comm <- tm_shape(ortho, # on charge notre orthomosaïque
 #carte_5comm # on visualise le résultat
 
 tmap_save(tm = carte_5comm,
-          filename = 'figures/carte_5comm.png', # on nomme le fichier # l'extension définit le format
+          filename = '03_figs/carte_5comm.png', # on nomme le fichier # l'extension définit le format
           dpi = 600, # résolution en pixels par pouce
           width = 8) # largeur de l'image en pouces
 
@@ -698,7 +698,7 @@ especes # on examine le résultat
 
 library(svglite)
 library(spocc)
-svglite("figures/ACP_3comm.svg")
+svglite("03_figs/ACP_3comm.svg")
 # Avec 3 communautés : 
 acp_graph_sites <- ggplot(sites) + # on utilise le tableau sites
   geom_text(aes(x = PC1,
@@ -733,7 +733,7 @@ acp_graph_sites_sp # voyons le résultat
 dev.off()
 
 # Enregistrement de la figure ACP
-ggsave(acp_graph_sites_sp, file = 'figures/ACP_3comm.png', # nom du fichier avec extension
+ggsave(acp_graph_sites_sp, file = '03_figs/ACP_3comm.png', # nom du fichier avec extension
        width = 8, # largeur en pouces
        height = 6, # hauteur en pouces
        dpi = 300) # résolution en pixels par pouce
@@ -785,11 +785,11 @@ anova(spe.rda.sel, by = "axis", permutations = how(nperm = 999))
 ## Triplots of the rda results (lc scores) ----
 ## Site scores as linear combinations of the environmental variables
 
-source('functions/triplot.rda.R')
+source('01_scripts/r_functions/triplot.rda.R')
 # Triplots with function triplot.rda(), scalings 1 and 2, lc scores
 
 # Figure : "RDA plot with triplot.rda"
-png("figures/RDA_triplot.rda.lc.png",
+png("03_figs/RDA_triplot.rda.lc.png",
     height = 8, width = 16, # taille
     units = "in", # unités
     res = 300) # résolution
@@ -823,7 +823,7 @@ dev.off()
 
 library(svglite)
 library(spocc)
-svglite("figures/RDA_triplot.rda.lc.svg",
+svglite("03_figs/RDA_triplot.rda.lc.svg",
         height = 8, width = 16)
 par(mfrow = c(1, 2))
 triplot.rda(spe.rda.sel, 
@@ -858,7 +858,7 @@ dev.off()
 # Triplots with function triplot.rda(), scalings 1 and 2, wa scores
 
 # Figure : "RDA plot with triplot.rda"
-png("figures/RDA_triplot.rda.wa.png",
+png("03_figs/RDA_triplot.rda.wa.png",
     height = 8, width = 16, # taille
     units = "in", # unités
     res = 300) # résolution

@@ -4,7 +4,7 @@ author: "Ariane Roberge"
 date: "`r Sys.Date()`"
 output:
   word_document: 
-    reference_docx: texte_modele.docx
+    reference_docx: text_template_for_RMD.docx
 ---
 
 ```{r setup, include=FALSE}
@@ -32,7 +32,7 @@ panderOptions('keep.trailing.zeros', TRUE)
 
 ```{r Importation des packages, echo=FALSE}
 library(sf)
-library(esri2sf)
+#library(esri2sf)
 library(tidyverse)
 ```
 
@@ -44,7 +44,7 @@ library(tidyverse)
 
 ```{r Liste espèces, echo=FALSE}
 # Fichier différent de especes.txt, car PIMA, PIRU, PIGL n'ont pas été changés en Picea.
-especes_tab <- read.table('00_rawdata/especes_tab.txt', header = TRUE, sep = ";") %>%
+especes_tab <- read.table('../00_rawdata/especes_tab.txt', header = TRUE, sep = ";") %>%
   rename(`Nom scientifique (latin)` = 'scientific_name',
          `Code d'espèce` = 'codesp')
 knitr::kable(especes_tab,
@@ -58,7 +58,7 @@ knitr::kable(especes_tab,
 
 ```{r Importation et nettoyage des données darbres, echo=FALSE}
 #### Importation et nettoyage des données d'arbres (type sf) ----
-Z1_polygones <- read_sf("00_rawdata/Z1_polygones.geojson") %>% # on lit le fichier
+Z1_polygones <- read_sf("../00_rawdata/Z1_polygones.geojson") %>% # on lit le fichier
   st_transform(2950) %>% # on transforme au code 2950
   select(OBJECTID, Label, surf_m2) %>% # on sélectionne les variables pertinentes
   filter(Label != 'Mort' & Label != 'Acer' & Label != 'Populus' & Label != 'Feuillus' & Label != 'Conifere' & Label != 'Betula' & Label != 'PRPE') # on enlève les classes non représentatives
@@ -79,7 +79,7 @@ knitr::kable(table2,
 ### Placettes forestières
 
 ```{r Visualisation tableau grid_coord, echo=FALSE}
-table3 <- read.csv("02_outdata/grid_coord.csv") %>%
+table3 <- read.csv("../02_outdata/grid_coord.csv") %>%
   rename("X (m)" = X,
          "Y (m)" = Y)
 table3 <- table3[, c(3, 1, 2)] #On réordonne le dataframe pour avoir le grid_id en 1ère colonne
@@ -90,7 +90,7 @@ knitr::kable(head(table3),
 ### Abondances d’espèces d’arbres
 
 ```{r Visualisation tableau spe, echo=FALSE}
-table4 <- read.csv("02_outdata/spe.csv", row.names=1)
+table4 <- read.csv("../02_outdata/spe.csv", row.names=1)
 knitr::kable(head(table4),
  caption = "Tableau 4 : Composition des placettes forestières", row.names = TRUE)
 ```
@@ -99,7 +99,7 @@ knitr::kable(head(table4),
 
 ```{r Visualisation tableau grid_topo, echo=FALSE}
 # Importation des placettes forestières avec var. environnementales
-table5 <- read_sf("data_output/grid_topo.geojson") # on lit le fichier
+table5 <- read_sf("../02_outdata/grid_topo.geojson") # on lit le fichier
 
 table5 <- table5[, c(1, 6, 5, 7, 10, 11)] %>% #On réordonne le dataframe pour avoir le grid_id en 1ère colonne
   st_drop_geometry() %>%
@@ -117,13 +117,13 @@ knitr::kable(head(table5),
 # Méthodes
 ## Analyse exploratoire des données
 
-![Figure 1 : Occurrences et fréquences relatives des espèces](figures/hist_freq.png)
+![Figure 1 : Occurrences et fréquences relatives des espèces](../03_figs/hist_freq.png)
 
 
-![Figure 2 : Abondance et richesse spécifique au sein des placettes forestières](figures/nb_sp_nb_ind.png)
+![Figure 2 : Abondance et richesse spécifique au sein des placettes forestières](../03_figs/nb_sp_nb_ind.png)
 
 ```{r tableau abondance par espèce, echo=FALSE}
-arbres_SBL_sel <- read_csv("data_output/arbres_SBL_sel.csv")
+arbres_SBL_sel <- read_csv("../02_outdata/arbres_SBL_sel.csv")
 
 table8 <- arbres_SBL_sel %>%
   rename(`Code d'espèce`= Label)
@@ -131,15 +131,15 @@ knitr::kable(table8,
  caption = "Tableau 8 : Nombre d'individus par espèce inventoriée", row.names = TRUE)
 ```
 
-![Figure 3 : Distribution des classes d'abondance au sein des placettes forestières](figures/classes_abondance.png)
+![Figure 3 : Distribution des classes d'abondance au sein des placettes forestières](../03_figs/classes_abondance.png)
 
 
 ## Transformation des données d'arbres
 
-![Figure 4 : Diagramme de boîte à moustaches des abondances transformées de l'espèce la plus commune, Betula papyrifera](figures/transfo.png)
+![Figure 4 : Diagramme de boîte à moustaches des abondances transformées de l'espèce la plus commune, Betula papyrifera](../03_figs/transfo.png)
 
 ```{r tableau transformations, echo=FALSE}
-transfo.R2aj <- read.csv("02_outdata/transfo.R2aj.csv") %>%
+transfo.R2aj <- read.csv("../02_outdata/transfo.R2aj.csv") %>%
   rename(`R2 ajusté` = "R2ajusté")
 knitr::kable(transfo.R2aj,
  caption = "Tableau 9 : Comparaison de la proportion de la variance expliquée par les différents jeux de données transformés", row.names = FALSE, digits = 4)
@@ -147,17 +147,17 @@ knitr::kable(transfo.R2aj,
 
 ## Groupement en communautés écoforestières
 
-![3comm](figures/carte_liens3_logchord.png)![4comm](figures/carte_liens4_logchord.png)
+![3comm](../03_figs/carte_liens3_logchord.png)![4comm](../03_figs/carte_liens4_logchord.png)
 
-![Figure 5 : Groupements en 3, 4 et 5 communautés écoforestières](figures/carte_liens5_logchord.png)
+![Figure 5 : Groupements en 3, 4 et 5 communautés écoforestières](../03_figs/carte_liens5_logchord.png)
 
 ## Ordination simple (analyse en composantes principales)
 
-![Figure 6 : Analyse en composantes principales, cadrage 1](figures/ACP_3comm.png)
+![Figure 6 : Analyse en composantes principales, cadrage 1](../03_figs/ACP_3comm.png)
 
 ## Ordination canonique (analyse de redondance)
 ```{r tableau selection variables, echo=FALSE}
-sel.variables <- read.csv("data_output/sel.var.csv") %>%
+sel.variables <- read.csv("../02_outdata/sel.var.csv") %>%
   rename(`Variables` = "variables",
          `Ordre` = "order",
          `R2 cumulé` = "R2Cum",
@@ -168,13 +168,13 @@ knitr::kable(sel.variables,
 ```
 
 # Annexe 1 : Figures supplémentaires
-![Figure A1 : Fréquences relatives des espèces au sein des communautés, pour trois communautés](figures/graph_comm3.png)
+![Figure A1 : Fréquences relatives des espèces au sein des communautés, pour trois communautés](../03_figs/graph_comm3.png)
 
-![Figure A2 : Fréquences relatives des espèces au sein des communautés, pour quatre communautés](figures/graph_comm4.png)
+![Figure A2 : Fréquences relatives des espèces au sein des communautés, pour quatre communautés](../03_figs/graph_comm4.png)
 
 
-![Figure A3 : Fréquences relatives des espèces au sein des communautés, pour cinq communautés](figures/graph_comm5.png)
+![Figure A3 : Fréquences relatives des espèces au sein des communautés, pour cinq communautés](../03_figs/graph_comm5.png)
 
-![Figure A4 : Distribution des communautés écoforestières](figures/carte_3comm.png)
+![Figure A4 : Distribution des communautés écoforestières](../03_figs/carte_3comm.png)
 
-![Figure A5 : Analyse de redondance. a: cadrage 1; b: cadrage 2. Fitted site scores (lc scores).](figures/RDA_triplot.rda.lc.png)
+![Figure A5 : Analyse de redondance. a: cadrage 1; b: cadrage 2. Fitted site scores (lc scores).](../03_figs/RDA_triplot.rda.lc.png)
