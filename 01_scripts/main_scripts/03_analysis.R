@@ -455,9 +455,9 @@ comm5_tbl <- comm5_tbl %>% # on peut stocker les noms dans notre objet contenant
 comm5_tbl # on examine le résultat
 
 # On enregistre le fichier avec les noms des communautés
-write_csv(comm3_tbl, "02_outdata/comm3.csv")
-write_csv(comm4_tbl, "02_outdata/comm4.csv")
-write_csv(comm5_tbl, "02_outdata/comm5.csv")
+#write_csv(comm3_tbl, "02_outdata/comm3.csv")
+#write_csv(comm4_tbl, "02_outdata/comm4.csv")
+#write_csv(comm5_tbl, "02_outdata/comm5.csv")
 
 # Figures des fréquences relatives (après la détermination des noms) ----
 # Pour 3 communautés (avec log-Chord) :

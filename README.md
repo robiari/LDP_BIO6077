@@ -27,7 +27,7 @@
 
 * *04_manuscript:* contains all RMD scripts, .docx and .pdf of the manuscript
 
-* *renv:* ugiheroiufhuierhfo
+* *renv:* 
 
 
 **File naming conventions:**

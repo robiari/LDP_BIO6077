@@ -6,6 +6,8 @@ output:
   word_document: 
     reference_docx: text_template_for_RMD.docx
 bibliography: references.bib
+#link-citations: true
+csl: nature_doublespaced.csl
 ---
 
 ```{r setup, include=FALSE}
@@ -114,7 +116,7 @@ Ces vols de drone ont permis de survoler environ 43 hectares de forêt, se divis
 
 ### Arbres inventoriés
 
-Pour ce travail de session, l'aire d'étude considérée se limitera à la zone 1, représentant une superficie d'environ 20 hectares. Après le nettoyage des données, le jeu de données comportant les entités relatives aux polygones des arbres de cette zone compte 9818 lignes et quatre colonnes (Tableau 2). Chaque individu est accompagné d'un identifiant unique, d'un code d'espèce, des coordonnées projetées du polygone (mètres) et de la surface occupée par sa couronne (m2). Au total, 17 essences d'arbres sont présentes, dont une catégorie regroupant toutes les espèces d'épinettes inventoriées; toutes les autres catégories sont des espèces d'arbres. Les différentes espèces d'épinettes ont été regroupées au genre, et non à l'espèce, étant donné qu'elles s'hybrident fréquemment entre elles et, donc, que les erreurs d'identification sont beaucoup plus fréquentes au sein de ce genre.
+Pour ce travail de session, l'aire d'étude considérée se limitera à la zone 1, représentant une superficie d'environ 20 hectares. Après le nettoyage des données, le jeu de données comportant les entités relatives aux polygones des arbres de cette zone compte 9818 lignes et quatre colonnes (Tableau 2). Chaque individu est accompagné d'un identifiant unique, d'un code d'espèce, des coordonnées projetées du polygone (mètres) et de la surface occupée par sa couronne (m^2^). Au total, 17 essences d'arbres sont présentes, dont une catégorie regroupant toutes les espèces d'épinettes inventoriées; toutes les autres catégories sont des espèces d'arbres. Les différentes espèces d'épinettes ont été regroupées au genre, et non à l'espèce, étant donné qu'elles s'hybrident fréquemment entre elles et, donc, que les erreurs d'identification sont beaucoup plus fréquentes au sein de ce genre.
 
 ```{r Importation et nettoyage des données darbres, echo=FALSE}
 #### Importation et nettoyage des données d'arbres (type sf) ----
@@ -133,7 +135,7 @@ table2 <- head(Z1_polygones) %>%
          `Code d'espèce` = 'Label',
          'Géométrie' = geometry)
 knitr::kable(table2,
- caption = "Tableau 2 : Polygones des arbres inventoriés dans la zone 1 de la Sration de biologie des Laurentides")
+ caption = "Tableau 2 : Polygones des arbres inventoriés dans la zone 1 de la Station de biologie des Laurentides")
 ```
 
 ### Placettes forestières
@@ -194,14 +196,25 @@ table5 <- table5[, c(1, 6, 5, 7, 10, 11)] %>% #On réordonne le dataframe pour a
          'Northness exposure' = northness_exp)
 
 knitr::kable(head(table5),
- caption = "Tableau 5 : Variables topographiques relatives à chacune des placettes forestières")
+ caption = "Tableau 5 : Variables topographiques relatives à chacune des placettes forestières de la zone 1 de la Station de biologie des Laurentides.")
 ```
 
 # Méthodes
 
-## Analyse exploratoire des données
-
 ## Transformation des données d'arbres
+
+Avant toute analyse, il faut d'abord procéder aux transformations des différents jeux de données. D'abord, la matrice des variables topographiques a été centrée-réduite pour rendre leurs dimensions homogènes et, ainsi, permettre la comparaison des variables explicatives entre elles.
+
+Puis, plusieurs analyses statistiques, par exemple l'analyse en composantes principales (ACP) et l'analyse de redondance (RDA), requièrent que les données respectent la distance Euclidienne [@legendre1999; @legendre2012]. Or, celle-ci n'est pas adaptée aux données d'abondances brutes, notamment en raison de la présence du « problème du double zéro ». Lorsque l'on compare la composition en espèces de différentes placettes d'inventaire, la présence d'une même espèce sur deux placettes suggère qu'elles ont probablement des conditions similaires. Cependant, lorsque deux placettes n'ont aucune espèce en commun, cela ne témoigne pas d'une similitude entre elles, car cela pourrait être dû à de nombreux facteurs autres que l'absence d'une niche écologique appropriée pour cette espèce. La distance Euclidienne ne permet pas de prendre en considération ces doubles absences. Ainsi, pour les données d'abondances d'espèces, il est souvent préférable d'utiliser des mesures de distance alternatives. [@legendre2001; @legendre2012]
+
+Étant donné que de nombreuses mesures peuvent être utilisées pour régler ce problème, les données issues de différentes transformations ont été mises en relation avec les variables environnementales au moyen d'une ordination canonique afin de déterminer celle permettant d'expliquer la plus grande proportion de la variance. Après la comparaison des R2 ajustés (Tableau 6), la transformation log-Chorde a été choisie pour être appliquée sur les données d'abondances brutes.
+
+```{r tableau transformations, echo=FALSE}
+transfo.R2aj <- read.csv("../02_outdata/transfo.R2aj.csv") %>%
+  rename(`R2 ajusté` = "R2ajusté")
+knitr::kable(transfo.R2aj,
+ caption = "Tableau 6 : Proportion de la variance des données d’espèces d’arbres inventoriées au sein des placettes forestières de la zone 1 de la Station de biologie des Laurentides expliquée les variables environnementales.", row.names = FALSE, digits = 4)
+```
 
 ## Groupement en communautés écoforestières
 
@@ -210,8 +223,6 @@ knitr::kable(head(table5),
 ## Ordination canonique (analyse de redondance)
 
 # Résultats
-
-## Analyse exploratoire des données
 
 ## Groupement en communautés écoforestières
 
@@ -229,3 +240,9 @@ knitr::kable(head(table5),
 ![Figure A1 : Carte des limites de la Station de biologie des Laurentides](../03_figs/FigureA1.png)
 
 ![Figure A2: Localisation de l'aire d'étude. a : Carte des limites de la Station de biologie des Laurentides. La rectangle orange cible les zones 1, 2 et 3. b : Carte de l'ensemble des trois zones. Le rectangle marron cible la zone 1. c : Une partie des polygones de couronnes d'arbres annotés dans ArcGIS Pro.](../03_figs/FigureA2.png)
+
+![Figure A3: Superficies relatives des espèces d'arbres selon leur communauté, pour trois communautés écoforestières.](../03_figs/graph_comm3.png)
+
+![Figure A4: Superficies relatives des espèces d'arbres selon leur communauté, pour quatre communautés écoforestières.](../03_figs/graph_comm4.png)
+
+![Figure A5: Superficies relatives des espèces d'arbres selon leur communauté, pour cinq communautés écoforestières.](../03_figs/graph_comm5.png)

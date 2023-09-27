@@ -328,7 +328,7 @@ rownames(grid.env) <- grid.env$grid_id # on utilise la colonne grid_id comme row
 ncol(grid.env)
 grid.env <- grid.env[4:ncol(grid.env)]
 
-write.csv(grid.env,"02_outdata/grid.env.csv", row.names = TRUE)
+#write.csv(grid.env,"02_outdata/grid.env.csv", row.names = TRUE)
 
 ## Corrélation des variables environnementales ----
 grid.env.cor = cor(grid.env, method = c("spearman"))
