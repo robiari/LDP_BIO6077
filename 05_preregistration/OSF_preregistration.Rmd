@@ -34,7 +34,7 @@ Example: Effect of sugar on brownie tastiness.
 More info: The title should be a specific and informative description of a project. Vague titles such as 'Fruit fly preregistration plan' are not appropriate.
 -->
 ```
-Succession forestière après feu: Où la forêt en est-elle rendue 100 ans plus tard?
+Succession forestière après feu : Où la forêt en est-elle rendue 100 ans plus tard?
 
 ### 2. Authorship
 
@@ -43,7 +43,7 @@ Succession forestière après feu: Où la forêt en est-elle rendue 100 ans plus
 List authors and affiliations as applicable. Placing a number or letter in upward arrows, (e.g. ^2^) creates a superscript
 -->
 ```
-Ariane Roberge^1^
+Ariane Roberge^1^ Etienne Laliberté^1^
 
 ^1^ Département de Sciences Biologiques, Institut de Recherche en Biologie Végétale, Université de Montréal, 4101 Sherbrooke Est, Montréal, QC H1X 2B2, Canada.
 
@@ -85,7 +85,7 @@ In this section, you will be asked to describe the overall design of your study.
 Delete all that do not apply.
 -->
 ```
--   Observational Study - Data is collected from study subjects that are not randomly assigned to a treatment. This includes surveys, ñnatural experiments,î and regression discontinuity designs.
+-   Observational Study - Data is collected from study subjects that are not randomly assigned to a treatment. This includes surveys, natural experiments, and regression discontinuity designs.
 
 ### 6. Blinding
 
@@ -105,7 +105,7 @@ Describe any additional blinding procedures that were not covered by the options
 ```
 -   Not applicable.
 
-### 8. Study design
+### 8. Study Design
 
 ```{=html}
 <!-- 
@@ -147,14 +147,6 @@ Preregistration is designed to make clear the distinction between confirmatory t
 Delete all that do not apply. 
 -->
 ```
--   Registration prior to creation of data: As of the date of submission of this research plan for preregistration, the data have not yet been collected, created, or realized.
-
--   Registration prior to any human observation of the data: As of the date of submission, the data exist but have not yet been quantified, constructed, observed, or reported by anyone - including individuals that are not associated with the proposed study. Examples include museum specimens that have not been measured and data that have been collected by non-human collectors and are inaccessible.
-
--   Registration prior to accessing the data: As of the date of submission, the data exist, but have not been accessed by you or your collaborators. Commonly, this includes data that has been collected by another researcher or institution.
-
--   Registration prior to analysis of the data: As of the date of submission, the data exist and you have accessed it, though no analysis has been conducted related to the research plan (including calculation of summary statistics). A common situation for this scenario when a large dataset exists that is used for many different studies over time, or when a data set is randomly split into a sample for exploratory analyses, and the other section of data is reserved for later confirmatory data analysis.
-
 -   Registration following analysis of the data: As of the date of submission, you have accessed and analyzed some of the data relevant to the research plan. This includes preliminary analysis of variables, calculation of descriptive statistics, and observation of data distributions. Please see cos.io/prereg for more information.
 
 ### 11. Explanation of existing data
@@ -330,7 +322,7 @@ Example: No checks will be performed to determine eligibility for inclusion besi
 More information: Any rule for excluding a particular set of data is acceptable. One may describe rules for excluding a participant or for identifying outlier data.
 -->
 ```
-Describe your data exclusion criteria here or state not applicable.
+-   Not applicable.
 
 ### 23. Missing data
 
@@ -343,7 +335,7 @@ Example: If a subject does not complete any of the three indices of tastiness, t
 More information: Any relevant explanation is acceptable. As a final reminder, remember that the final analysis must follow the specified plan, and deviations must be either strongly justified or included as a separate, exploratory analysis. 
 -->
 ```
-State your process for dealing with missing data or state not applicable.
+-   Not applicable.
 
 ### 24. Exploratory analysis
 
@@ -365,7 +357,7 @@ Enter any plans for exploratory data analysis here or state not applicable.
 If there is any additional information that you feel needs to be included in your preregistration, please enter it here. Literature cited, disclosures of any related work such as replications or work that uses the same data, or other context that will be helpful for future readers would be appropriate here. 
 -->
 ```
-Enter any additional information not covered by other sections, or state not applicable.
+-   Not applicable.
 
 ## References
 

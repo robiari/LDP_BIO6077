@@ -157,13 +157,13 @@ knitr::kable(transfo.R2aj,
 
 ## Ordination canonique (analyse de redondance)
 ```{r tableau selection variables, echo=FALSE}
-sel.variables <- read.csv("../02_outdata/sel.var.csv") %>%
+var_seliables <- read.csv("../02_outdata/var_sel.csv") %>%
   rename(`Variables` = "variables",
          `Ordre` = "order",
          `R2 cumulé` = "R2Cum",
          `R2 ajusté cumulé` = "AdjR2Cum",
          `p-value` = "pvalue",)
-knitr::kable(sel.variables,
+knitr::kable(var_seliables,
  caption = "Tableau 10 : Variables topographiques sélectionnées au moyen d'une sélection ascendante", row.names = FALSE, digits = 4)
 ```
 

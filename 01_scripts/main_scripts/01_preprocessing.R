@@ -113,36 +113,6 @@ arbres_poly_sel <- right_join(Z1_polygones, arbres_cent_sel)
 head(arbres_poly_sel)
 #st_write(arbres_poly_sel, dsn = "02_outdata/arbres_poly_sel.geojson", driver = "GeoJSON") ## package sf
 
-#### Superficies de la canopée ----
-# ? ATTENTION: Répétition des calculs de superficie avec la section : Sélection des placettes comportant SUFFISAMMENT d'annotations
-
-# Superficie de la canopée par espèce par placette
-surfs <- arbres_poly_sel %>% # on part des données initiales d'arbres
-  st_drop_geometry() %>%
-  group_by(grid_id, Label) %>% # on groupe par station et par espèce d'arbre
-  summarise(sum_surf_m2 = sum(surf_m2)) %>% # on calcule la somme des superficies des canopées par station
-  mutate(sum_surf_m2_ha = (sum_surf_m2 *25)) # on reporte le tout en m2 ha-1, par espèce
-surfs # on examine le résultat
-
-# Superficie de canopée relative par espèce par placette
-surfs <- surfs %>% # on part du tableau précédent
-  ungroup() %>%
-  group_by(grid_id) %>% # on groupe par placette
-  mutate(surf_rel = sum_surf_m2_ha / sum(sum_surf_m2_ha)) # on calcule la superficie de canopée relative de chaque espèce par placette
-surfs$grid_id <- as.character(surfs$grid_id)
-
-write.csv(surfs,"02_outdata/surfs.csv", row.names = FALSE)
-
-#On peut aussi calculer la superficie de la canopée présente, toutes espèces confondues.
-#Une forêt mature peut avoir jusqu'à 100% de sa surface recouverte par une canopée.
-
-surf_grid <- surfs %>% 
-  ungroup() %>%  # on enlève les groupes précédemment définis
-  group_by(grid_id) %>% 
-  summarise(surf_tot = sum(sum_surf_m2_ha),
-            surf_tot_pourc = (sum(sum_surf_m2_ha)/10000)*100)
-surf_grid
-
 # Aperçu du nombre d'individus par espèces dans les placettes sélectionnées
 arbres_SBL_sel <- st_drop_geometry(arbres_poly_sel) %>%
   group_by(Label) %>%
@@ -178,3 +148,33 @@ rownames(spe) <- grid_id # on utilise les grid_id comme noms de lignes
 head(spe) # format "large" corrigé et transformé en matrix avec nom
 
 write.csv(spe,"02_outdata/spe.csv", row.names = TRUE)
+
+#### Superficies de la canopée ----
+# ? ATTENTION: Répétition des calculs de superficie avec la section : Sélection des placettes comportant SUFFISAMMENT d'annotations
+
+# Superficie de la canopée par espèce par placette
+surfs <- arbres_poly_sel %>% # on part des données initiales d'arbres
+  st_drop_geometry() %>%
+  group_by(grid_id, Label) %>% # on groupe par station et par espèce d'arbre
+  summarise(sum_surf_m2 = sum(surf_m2)) %>% # on calcule la somme des superficies des canopées par station
+  mutate(sum_surf_m2_ha = (sum_surf_m2 *25)) # on reporte le tout en m2 ha-1, par espèce
+surfs # on examine le résultat
+
+# Superficie de canopée relative par espèce par placette
+surfs <- surfs %>% # on part du tableau précédent
+  ungroup() %>%
+  group_by(grid_id) %>% # on groupe par placette
+  mutate(surf_rel = sum_surf_m2_ha / sum(sum_surf_m2_ha)) # on calcule la superficie de canopée relative de chaque espèce par placette
+surfs$grid_id <- as.character(surfs$grid_id)
+
+write.csv(surfs,"02_outdata/surfs.csv", row.names = FALSE)
+
+#On peut aussi calculer la superficie de la canopée présente, toutes espèces confondues.
+#Une forêt mature peut avoir jusqu'à 100% de sa surface recouverte par une canopée.
+
+surf_grid <- surfs %>% 
+  ungroup() %>%  # on enlève les groupes précédemment définis
+  group_by(grid_id) %>% 
+  summarise(surf_tot = sum(sum_surf_m2_ha),
+            surf_tot_pourc = (sum(sum_surf_m2_ha)/10000)*100)
+surf_grid

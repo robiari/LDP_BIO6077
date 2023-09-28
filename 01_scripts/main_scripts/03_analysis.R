@@ -18,8 +18,51 @@ head(spe)
 # Placettes forestières et données environnementales
 grid_topo <- read_sf("02_outdata/grid_topo.geojson") # on lit le fichier
 
-grid.env2 <- read.csv("02_outdata/grid.env2.csv", row.names=1) # rn pour rownames (garde les grid_id)
-head(grid.env2)
+#### Édition du fichier grid_topo pour le faire fonctionner avec les analyses ----
+grid_env <- grid_topo %>%
+  st_drop_geometry() %>%
+  as.data.frame()
+rownames(grid_env) <- grid_env$grid_id # on utilise la colonne grid_id comme rownames
+
+ncol(grid_env)
+grid_env <- grid_env[4:ncol(grid_env)]
+
+## Corrélation des variables environnementales ----
+grid_env.cor = cor(grid_env, method = c("spearman"))
+
+library("Hmisc")
+library("corrplot")
+
+png("03_figs/corrplot_env.png",
+    height = 6, width = 6, # taille
+    units = "in", # unités
+    res = 300) # résolution
+corrplot(grid_env.cor, 
+         method = "color", 
+         type = 'lower', 
+         insig='blank',
+         addCoef.col ='black',
+         order="hclust", 
+         diag=TRUE)
+dev.off()
+
+# Nous devons choisir entre eastness/northness ou eastness exposure/northness exposure.
+# Nous choisissons avec exposure, car cela fait plus de sens d'un point de vue écologique.
+
+grid_env <- grid_env %>%
+  select(-c(pentes, eastness, northness))
+
+head(grid_env)
+
+#write.csv(grid_env,"02_outdata/grid_env.csv", row.names = TRUE)
+
+# Statistiques sur les variables topographiques ----
+env_stat <- data.frame('Moyenne' = apply(grid_env, 2, mean, na.rm = TRUE),
+                       'Écart-type' = apply(grid_env, 2, sd, na.rm = TRUE),
+                       'Étendue' = apply(grid_env, 2, max, na.rm = TRUE)-apply(grid_env, 2, min, na.rm = TRUE),
+                       'Cov' = (apply(grid_env, 2, sd, na.rm = TRUE)/apply(grid_env, 2, mean, na.rm = TRUE))*100) %>%
+  t() %>% # transposer le tableau
+  as.data.frame()
 
 #### Transformation des données environnementales ----
 # Scatter plots for all pairs of environmental variables (NEwR, chap.2) 
@@ -30,14 +73,14 @@ dev.new(
   width = 10,
   height = 10,
   noRStudioGD = TRUE)
-pairs(grid.env2, 
+pairs(grid_env, 
       panel = panel.smooth, 
       diag.panel = panel.hist,
       main = "Bivariate Plots with Histograms and Smooth Curves")
 
 # Standardization of all environmental variables (NEwR, chap.2)
 # Center and scale = standardize the variables (z-scores)
-grid.env2 <- as.data.frame(scale(grid.env2)) # means = 0 // standard deviations = 1
+grid_env <- as.data.frame(scale(grid_env)) # means = 0 // standard deviations = 1
 
 #### Exploration de la table de données d'arbres - après correction ----
 # From NEwR: # Exploration of a data frame using basic R functions (Chap.2)
@@ -237,31 +280,31 @@ dev.off()
 
 #### Ordination canonique - Choix de la transformation des abondances ----
 # Sans transformation
-spe.brute.rda <- rda(spe, grid.env2)
+spe.brute.rda <- rda(spe, grid_env)
 brute.R2aj <- RsquareAdj(spe.brute.rda)$adj.r.squared
 
 # Chorde
-spe.norm.rda <- rda(spe.norm, grid.env2)
+spe.norm.rda <- rda(spe.norm, grid_env)
 chorde.R2aj <- RsquareAdj(spe.norm.rda)$adj.r.squared 
 
 # Hellinger
-spe.hel.rda <- rda(spe.hel, grid.env2)
+spe.hel.rda <- rda(spe.hel, grid_env)
 hel.R2aj <- RsquareAdj(spe.hel.rda)$adj.r.squared 
 
 # Khi-carré
-spe.chisq.rda <- rda(spe.chisq, grid.env2)
+spe.chisq.rda <- rda(spe.chisq, grid_env)
 chisq.R2aj <- RsquareAdj(spe.chisq.rda)$adj.r.squared 
 
 # Total
-spe.total.rda <- rda(spe.total, grid.env2)
+spe.total.rda <- rda(spe.total, grid_env)
 tot.R2aj <- RsquareAdj(spe.total.rda)$adj.r.squared 
 
 # log-chorde
-spe.ln.norm.rda <- rda(spe.ln.norm, grid.env2)
+spe.ln.norm.rda <- rda(spe.ln.norm, grid_env)
 ln.norm.R2aj <- RsquareAdj(spe.ln.norm.rda)$adj.r.squared
 
 # double square root (Box-cox chord, bc.exp = 0.25)
-spe.bc.rda <- rda(spe.bc, grid.env2)
+spe.bc.rda <- rda(spe.bc, grid_env)
 boxcox.R2aj <- RsquareAdj(spe.bc.rda)$adj.r.squared 
 
 transfo.R2aj <- data.frame("Transformation" = c("Aucune", "Chorde", "Hellinger",
@@ -555,80 +598,83 @@ plot(grid_arbres["comm5_nom"]) # on visualise le résultat rapido
 
 dev.off()
 
-# Importation d'une orthomosaïque
-require(stars)
-ortho <- read_stars('00_rawdata/2021-09-28-sbl-cloutier-z1-P4RTK-MS.tif', 
-                    proxy = TRUE,
-                    NA_value = 0) %>% # car les valeurs manquantes sont 0 dans ce raster
-  st_transform(2950) # on transforme au code 2950
-# plot(ortho, rgb = 1:3) # pour une image couleur
-
-st_crs(ortho)$epsg 
-
-# Carte statique des communautés (3)
-tmap_mode("plot")
-
-carte_3comm <- tm_shape(ortho, # on charge notre orthomosaïque
-                        bbox = grid_arbres) + # on définit l'étendue à partir des communautés
-  tm_rgba() + # pour image RGB avec transparence (a)
-  tm_shape(grid_arbres) + # on charge les points
-  tm_polygons(col = "comm3_nom",
-              alpha = 0.5,
-              title = "Communautés") +
-  tm_layout(legend.position = c('right', 'bottom'),
-            inner.margins = c(0.05, .05, .05, .05)) + # on augmente les marges
-  tm_compass(type = "8star", position = c("left", "top")) + # rose des vents
-  tm_scale_bar() + # l'échelle
-  tm_graticules(lwd = 0.3,
-                alpha = 0.6)
-#carte_3comm # on visualise le résultat
-
-tmap_save(tm = carte_3comm,
-          filename = '03_figs/carte_3comm.png', # on nomme le fichier # l'extension définit le format
-          dpi = 600, # résolution en pixels par pouce
-          width = 8) # largeur de l'image en pouces
-
-# Carte statique des communautés (4)
-carte_4comm <- tm_shape(ortho, # on charge notre orthomosaïque
-                        bbox = grid_arbres) + # on définit l'étendue à partir des communautés
-  tm_rgba() + # pour image RGB avec transparence (a)
-  tm_shape(grid_arbres) + # on charge les points
-  tm_polygons(col = "comm4_nom",
-              alpha = 0.5,
-              title = "Communautés") +
-  tm_layout(legend.position = c('right', 'bottom'),
-            inner.margins = c(0.05, .05, .05, .05)) + # on augmente les marges
-  tm_compass(type = "8star", position = c("left", "top")) + # rose des vents
-  tm_scale_bar() + # l'échelle
-  tm_graticules(lwd = 0.3,
-                alpha = 0.6)
-#carte_4comm # on visualise le résultat
-
-tmap_save(tm = carte_4comm,
-          filename = '03_figs/carte_4comm.png', # on nomme le fichier # l'extension définit le format
-          dpi = 600, # résolution en pixels par pouce
-          width = 8) # largeur de l'image en pouces
-
-# Carte statique des communautés (5)
-carte_5comm <- tm_shape(ortho, # on charge notre orthomosaïque
-                        bbox = grid_arbres) + # on définit l'étendue à partir des communautés
-  tm_rgba() + # pour image RGB avec transparence (a)
-  tm_shape(grid_arbres) + # on charge les points
-  tm_polygons(col = "comm5_nom",
-              alpha = 0.5,
-              title = "Communautés") +
-  tm_layout(legend.position = c('right', 'bottom'),
-            inner.margins = c(0.05, .05, .05, .05)) + # on augmente les marges
-  tm_compass(type = "8star", position = c("left", "top")) + # rose des vents
-  tm_scale_bar() + # l'échelle
-  tm_graticules(lwd = 0.3,
-                alpha = 0.6)
-#carte_5comm # on visualise le résultat
-
-tmap_save(tm = carte_5comm,
-          filename = '03_figs/carte_5comm.png', # on nomme le fichier # l'extension définit le format
-          dpi = 600, # résolution en pixels par pouce
-          width = 8) # largeur de l'image en pouces
+# # Importation d'une orthomosaïque
+# require(stars)
+# ortho <- read_stars('00_rawdata/2021-09-28-sbl-cloutier-z1-P4RTK-MS.tif', 
+#                     proxy = TRUE,
+#                     NA_value = 0) %>% # car les valeurs manquantes sont 0 dans ce raster
+#   st_transform(2950) %>% # on transforme au code 2950
+#   st_crop(zone) %>% # on extrait la zone du Lac Croche
+#   st_as_stars() # on convertit au format stars 
+#    
+# # plot(ortho, rgb = 1:3) # pour une image couleur
+# 
+# st_crs(ortho)$epsg 
+# 
+# # Carte statique des communautés (3)
+# tmap_mode("plot")
+# 
+# carte_3comm <- tm_shape(ortho, # on charge notre orthomosaïque
+#                         bbox = grid_arbres) + # on définit l'étendue à partir des communautés
+#   tm_rgba() + # pour image RGB avec transparence (a)
+#   tm_shape(grid_arbres) + # on charge les points
+#   tm_polygons(col = "comm3_nom",
+#               alpha = 0.5,
+#               title = "Communautés") +
+#   tm_layout(legend.position = c('right', 'bottom'),
+#             inner.margins = c(0.05, .05, .05, .05)) + # on augmente les marges
+#   tm_compass(type = "8star", position = c("left", "top")) + # rose des vents
+#   tm_scale_bar() + # l'échelle
+#   tm_graticules(lwd = 0.3,
+#                 alpha = 0.6)
+# #carte_3comm # on visualise le résultat
+# 
+# tmap_save(tm = carte_3comm,
+#           filename = '03_figs/carte_3comm.png', # on nomme le fichier # l'extension définit le format
+#           dpi = 600, # résolution en pixels par pouce
+#           width = 8) # largeur de l'image en pouces
+# 
+# # Carte statique des communautés (4)
+# carte_4comm <- tm_shape(ortho, # on charge notre orthomosaïque
+#                         bbox = grid_arbres) + # on définit l'étendue à partir des communautés
+#   tm_rgba() + # pour image RGB avec transparence (a)
+#   tm_shape(grid_arbres) + # on charge les points
+#   tm_polygons(col = "comm4_nom",
+#               alpha = 0.5,
+#               title = "Communautés") +
+#   tm_layout(legend.position = c('right', 'bottom'),
+#             inner.margins = c(0.05, .05, .05, .05)) + # on augmente les marges
+#   tm_compass(type = "8star", position = c("left", "top")) + # rose des vents
+#   tm_scale_bar() + # l'échelle
+#   tm_graticules(lwd = 0.3,
+#                 alpha = 0.6)
+# #carte_4comm # on visualise le résultat
+# 
+# tmap_save(tm = carte_4comm,
+#           filename = '03_figs/carte_4comm.png', # on nomme le fichier # l'extension définit le format
+#           dpi = 600, # résolution en pixels par pouce
+#           width = 8) # largeur de l'image en pouces
+# 
+# # Carte statique des communautés (5)
+# carte_5comm <- tm_shape(ortho, # on charge notre orthomosaïque
+#                         bbox = grid_arbres) + # on définit l'étendue à partir des communautés
+#   tm_rgba() + # pour image RGB avec transparence (a)
+#   tm_shape(grid_arbres) + # on charge les points
+#   tm_polygons(col = "comm5_nom",
+#               alpha = 0.5,
+#               title = "Communautés") +
+#   tm_layout(legend.position = c('right', 'bottom'),
+#             inner.margins = c(0.05, .05, .05, .05)) + # on augmente les marges
+#   tm_compass(type = "8star", position = c("left", "top")) + # rose des vents
+#   tm_scale_bar() + # l'échelle
+#   tm_graticules(lwd = 0.3,
+#                 alpha = 0.6)
+# #carte_5comm # on visualise le résultat
+# 
+# tmap_save(tm = carte_5comm,
+#           filename = '03_figs/carte_5comm.png', # on nomme le fichier # l'extension définit le format
+#           dpi = 600, # résolution en pixels par pouce
+#           width = 8) # largeur de l'image en pouces
 
 # EXTRA: Carte interactive - Pour comparaison visuelle entre 3, 4 et 5 communautés ----
 
@@ -742,19 +788,19 @@ ggsave(acp_graph_sites_sp, file = '03_figs/ACP_3comm.png', # nom du fichier avec
 source('01_scripts/r_functions/triplot.rda.R')
 ## Selection of explanatory variables in RDA (Practicals using the R language p.31)
 dim(spe.transfo) # Response variables
-dim(grid.env2) # Explanatory variables
+dim(grid_env) # Explanatory variables
 
 # Sélection des variables avec forward.sel
-var.sel = forward.sel(spe.transfo, grid.env2)
+var.sel = forward.sel(spe.transfo, grid_env)
 
-write.csv(var.sel,"02_outdata/sel.var.csv", row.names = FALSE) # nécessaire?
+write.csv(var.sel,"02_outdata/var_sel.csv", row.names = FALSE) # nécessaire?
 
 # Run rda on selected variables
-(spe.rda.sel <- rda(spe.transfo ~ ., grid.env2[, var.sel$order[1:5]]))
+(spe.rda.sel <- rda(spe.transfo ~ ., grid_env[, var.sel$order[1:5]]))
 
 summary(spe.rda.sel)
 
-grid.env2.sel <- grid.env2[, var.sel$order[1:5]] # On crée un sous-jeu de données pour les variables significatives
+grid_env.sel <- grid_env[, var.sel$order[1:5]] # On crée un sous-jeu de données pour les variables significatives
 
 # Canonical coefficients from the rda object
 coef(spe.rda.sel)

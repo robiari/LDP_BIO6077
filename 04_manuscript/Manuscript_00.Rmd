@@ -292,7 +292,7 @@ Ensuite, même si la bétulaie à peuplier et érable rouge n'est pas clairement
 Les résultats de la sélection ascendante des variables topographiques sont présentés dans le Tableau X. D'après le test permutationnel effectué, les variables significatives sont: la pente, l'élévation, l'exposition Nord-Sud, l'indice d'humidité topographique et l'exposition Est-Ouest.
 
 ```{r tableau selection variables, echo=FALSE}
-sel.variables <- read.csv("../02_outdata/sel.var.csv") %>%
+sel.variables <- read.csv("../02_outdata/var_sel.csv") %>%
   rename(`Variables` = "variables",
          `Ordre` = "order",
          `R2 cumulé` = "R2Cum",
