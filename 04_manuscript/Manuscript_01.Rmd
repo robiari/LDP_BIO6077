@@ -163,6 +163,7 @@ knitr::kable(head(table4),
 
 ### Variables topographiques
 
+<<<<<<< HEAD
 La matrice explicative est constituée de cinq variables topographiques : l'élévation topographique (mètres), la pente (%), son orientation (représenté par le degré d'exposition vers l'Est et vers le Nord; radians) ainsi que l'indice d'humidité topographique (quantitatif; sans unité) (Table 5). Toutes ces variables sont extraites ou calculées à partir des produits dérivés du LiDAR provenant des données écoforestières du @ministèredesforêtsdelafauneetdesparcs;@ministèredesforêtsdelafauneetdesparcsa. Initialement, elles étaient toutes représentées à l'aide de données matricielles, il a donc été nécessaire d'extraire la moyenne des valeurs de ces variables pour chacune des placettes 20 × 20 m.
 
 L'élévation et l'indice d'humidité topographique ont été directement extraits des produits dérivés LiDAR, respectivement du modèle numérique de terrain (MNT) et de l'indice d'humidité topographique (TWI). La pente a été obtenue à l'aide d'une fonction *slope* [@dorman2021] appliquée sur le MNT, donnant alors une pente en degrés (0-360°). Puis, étant donné que les valeurs étaient toutes situées dans le premier quadrant (0-90°), il a été possible de rapporter ces valeurs sur 100 afin d'obtenir un pourcentage d'inclinaison. Concernant les variables d'orientation de pente, les degrés d'exposition (*eastness*/*northness exposure*) découlent directement des variables intermédiaires d'orientation vers l'Est et le Nord (*eastness*/*northness*).
