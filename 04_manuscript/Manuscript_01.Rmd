@@ -2,9 +2,9 @@
 title: "Travail de session"
 author: "Ariane Roberge"
 date: "`r Sys.Date()`"
-output:
-  word_document: 
-    reference_docx: text_template_for_RMD.docx
+output: pdf_document
+#  word_document: 
+#    reference_docx: text_template_for_RMD.docx
 bibliography: references.bib
 #link-citations: true
 csl: nature_doublespaced.csl
@@ -43,45 +43,45 @@ library(tidyverse)
 
 # Liste des tableaux
 
-**Tableau 1**. Espèces présentes dans la zone 1 de la Station de biologie des Laurentides.
+**Table 1**: Espèces présentes dans la zone 1 de la Station de biologie des Laurentides.
 
-**Tableau 2**. Polygones des arbres inventoriés dans la zone 1 de la Station de biologie des Laurentides.
+**Table 2**: Polygones des arbres inventoriés dans la zone 1 de la Station de biologie des Laurentides.
 
-**Tableau 3**. Coordonnées projetées des placettes forestières de la zone 1 de la Station de biologie des Laurentides.
+**Table 3**: Coordonnées projetées des placettes forestières de la zone 1 de la Station de biologie des Laurentides.
 
-**Tableau 4**. Composition en espèces des placettes forestières de la zone 1 de la Station de biologie des Laurentides.
+**Table 4**: Composition en espèces des placettes forestières de la zone 1 de la Station de biologie des Laurentides.
 
-**Tableau 5**. Variables topographiques relatives à chacune des placettes forestières de la zone 1 de la Station de biologie des Laurentides.
+**Table 5**: Variables topographiques relatives à chacune des placettes forestières de la zone 1 de la Station de biologie des Laurentides.
 
-**Tableau 6**. Proportion de la variance des données d'espèces d'arbres inventoriées au sein des placettes forestières de la zone 1 de la Station de biologie des Laurentides expliquée les variables environnementales.
+**Table 6**: Proportion de la variance des données d'espèces d'arbres inventoriées au sein des placettes forestières de la zone 1 de la Station de biologie des Laurentides expliquée les variables environnementales.
 
-**Tableau 7**. Variables topographiques responsables d'une partie de la variance présente dans les données d'espèces d'arbres.
+**Table 7**: Variables topographiques responsables d'une partie de la variance présente dans les données d'espèces d'arbres.
 
 # Liste des figures
 
-**Figure 1**. Groupements des placettes forestières de la zone 1 de la Station de biologie des Laurentides en 3, 4 et 5 communautés écoforestières (402 placettes).
+**Figure 1**: Carte des limites de la Station de biologie des Laurentides.
 
-**Figure 2**. Analyse en composantes principales des données des espèces d'arbres inventoriées au sein des placettes forestières de la zone 1 de la Station de biologie des Laurentides (17 classes d'arbres, 402 placettes).
+**Figure 2**: Localisation de l'aire d'étude. a : Carte des limites de la Station de biologie des Laurentides. La rectangle orange cible les zones 1, 2 et 3. b : Carte de l'ensemble des trois zones. Le rectangle marron cible la zone 1. c : Une partie des polygones de couronnes d'arbres annotés dans ArcGIS Pro.
 
-**Figure A1**. Carte des limites de la Station de biologie des Laurentides.
+**Figure 3**: Groupements des placettes forestières de la zone 1 de la Station de biologie des Laurentides en 3, 4 et 5 communautés écoforestières (402 placettes).
 
-**Figure A2**. Localisation de l'aire d'étude. a : Carte des limites de la Station de biologie des Laurentides. La rectangle orange cible les zones 1, 2 et 3. b : Carte de l'ensemble des trois zones. Le rectangle marron cible la zone 1. c : Une partie des polygones de couronnes d'arbres annotés dans ArcGIS Pro.
+**Figure 4**: Superficies relatives des espèces d'arbres selon leur communauté, pour trois communautés écoforestières.
 
-**Figure A3**. Superficies relatives des espèces d'arbres selon leur communauté, pour trois communautés écoforestières.
+**Figure 5**: Superficies relatives des espèces d'arbres selon leur communauté, pour quatre communautés écoforestières.
 
-**Figure A4**. Superficies relatives des espèces d'arbres selon leur communauté, pour quatre communautés écoforestières.
+**Figure 6**: Superficies relatives des espèces d'arbres selon leur communauté, pour cinq communautés écoforestières.
 
-**Figure A5**. Superficies relatives des espèces d'arbres selon leur communauté, pour cinq communautés écoforestières.
+**Figure 7**: Carte des communautés écoforestières de la zone 1 située sur la rive ouest du Lac Croche de la Station de biologie des Laurentides.
 
-**Figure A6**. Carte des communautés écoforestières de la zone 1 située sur la rive ouest du Lac Croche de la Station de biologie des Laurentides.
+**Figure 8**: Analyse en composantes principales des données des espèces d'arbres inventoriées au sein des placettes forestières de la zone 1 de la Station de biologie des Laurentides (17 classes d'arbres, 402 placettes).
 
-**Figure A7**. Analyse de redondance mettant en relation les données des espèces d'arbres inventoriées au sein des placettes forestières de la zone 1 de la Station de biologie des Laurentides et les variables topographiques (5 variables).
+**Figure 9**: Analyse de redondance mettant en relation les données des espèces d'arbres inventoriées au sein des placettes forestières de la zone 1 de la Station de biologie des Laurentides et les variables topographiques (5 variables).
 
 # Introduction
 
 ## Contexte et problématique
 
-Les perturbations naturelles et anthropiques telles que les feux, les coupes forestières et les épidémies d'insectes ont un impact significatif sur la dynamique des populations dans les écosystèmes forestiers. Ces perturbations peuvent entraîner des changements dans l'abondance et la composition des espèces, mais aussi dans la structure et les fonctions écosystémiques de la forêt [@kuuluvainen2021; @viljur2022]. La succession secondaire est un processus écologique qui peut survenir après une perturbation importante dans une forêt. Les communautés végétales se rétablissent graduellement, en commençant d'abord par l'établissement d'espèces pionnières, la plupart du temps intolérantes à l'ombre [@finegan1984]. Au fil du temps, celles-ci laissent place à des espèces plus tolérantes telles que l'érable à sucre et le hêtre à grandes feuilles [@burns1990; @nolet2008a]. Ce processus conduit à la formation de communautés d'espèces plus matures et stables, qui atteignent finalement un état d'équilibre appelé climax [@horn1974]. Au Québec, le territoire est séparé en domaines bioclimatiques qui correspondent aux peuplements de fin de succession de milieux mésiques [@ministèredesressourcesnaturellesetdesforêts2022].
+Les perturbations naturelles et anthropiques telles que les feux, les coupes forestières et les épidémies d'insectes ont un impact significatif sur la dynamique des populations dans les écosystèmes forestiers. Ces perturbations peuvent entraîner des changements dans l'abondance et la composition des espèces, mais aussi dans la structure et les fonctions écosystémiques de la forêt [@kuuluvainen2021; @viljur2022]. La succession secondaire est un processus écologique qui peut survenir après une perturbation importante dans une forêt. Les communautés végétales se rétablissent graduellement, en commençant d'abord par l'établissement d'espèces pionnières, la plupart du temps intolérantes à l'ombre [@finegan1984]. Au fil du temps, celles-ci laissent place à des espèces plus tolérantes telles que l'érable à sucre et le hêtre à grandes feuilles [@burns1990; @nolet2008]. Ce processus conduit à la formation de communautés d'espèces plus matures et stables, qui atteignent finalement un état d'équilibre appelé climax [@horn1974]. Au Québec, le territoire est séparé en domaines bioclimatiques qui correspondent aux peuplements de fin de succession de milieux mésiques [@ministèredesressourcesnaturellesetdesforêts2022].
 
 La région à l'étude, se trouvant sur la rive ouest du Lac Croche de la Station de biologie des Laurentides (SBL) de l'Université de Montréal,  est située dans le domaine bioclimatique de l'érablière à bouleau jaune [@ministèredesressourcesnaturellesetdesforêts2022]. Or, il a été constaté que l'érablière à bouleau jaune n'était pratiquement pas présente sur le territoire [@savage2001]. Des questions intéressantes se posent alors... Si les communautés écoforestières ne sont pas des érablières à bouleau jaune, alors quelles sont-elles? Quels sont les processus écologiques responsables de la composition des communautés écoforestières de l'aire d'étude? À quelles échelles spatiales œuvrent-ils?
 
@@ -95,28 +95,28 @@ La présente étude a nécessité plusieurs campagnes d'échantillonnage, toutes
 
 Toutefois, avant son statut de protection, l'aire d'étude a subi différentes perturbations majeures. Dans un premier temps, vers la fin des années 1800, l'exploitation forestière était très répandue sur les lots de forêt appartenant à la couronne. Il est donc fort probable que le territoire de la SBL ait été exploité il y a un peu plus d'un siècle. Dans un deuxième temps, ce dernier a été la proie des flammes au début 1900 par des feux d'amplitudes très variables. Le dernier feu de forêt que la SBL aurait subi, d'une très grande envergure, aurait probablement eu lieu en 1923. [@savage2001]
 
-Tel que mentionné précédemment, la SBL est située dans le domaine bioclimatique de l'érablière à bouleau jaune, mais cette communauté écoforestière n'est aucunement prédominante sur le territoire. En revanche, les espèces d'arbres ayant été recensées lors de la première campagne d'échantillonnage sont typique d'une forêt mixte tempérée (ex : sapin baumier, bouleau jaune, érable à sucre), ce qui ne dément pas sa nature (Tableau 1).
+Tel que mentionné précédemment, la SBL est située dans le domaine bioclimatique de l'érablière à bouleau jaune, mais cette communauté écoforestière n'est aucunement prédominante sur le territoire. En revanche, les espèces d'arbres ayant été recensées lors de la première campagne d'échantillonnage sont typique d'une forêt mixte tempérée (ex : sapin baumier, bouleau jaune, érable à sucre), ce qui ne dément pas sa nature (Table 1).
 
 ```{r Liste espèces, echo=FALSE}
 # Fichier différent de especes.txt, car PIMA, PIRU, PIGL n'ont pas été changés en Picea.
 especes_tab <- read.table('../00_rawdata/especes_tab.txt', header = TRUE, sep = ";") %>%
   rename(`Nom scientifique (latin)` = 'scientific_name',
          `Code d'espèce` = 'codesp')
-knitr::kable(especes_tab,
- caption = "Tableau 1 : Espèces présentes dans la zone 1 de la Station de biologie des Laurentides")
+knitr::kable(especes_tab, align = "lc",
+ caption = "Espèces présentes dans la zone 1 de la Station de biologie des Laurentides")
 ```
 
 ## Plan d'échantillonnage
 
 Au cours de l'été 2021, dans le cadre du projet de maîtrise de Myriam Cloutier, étudiante dans le laboratoire d'écologie fonctionnelle végétale (LEFO) d'Etienne Laliberté, de l'imagerie RGB à haute résolution fut acquise par drone à plusieurs reprises au-dessus de SBL. Les vols furent réalisés tous les mois de mai à octobre à l'aide du drone *DJI Phantom 4 RTK* afin d'obtenir des images témoignant des changements phénologiques des arbres à travers la saison. Puis, à l'aide du logiciel de photogrammétrie *Agisoft Metashape Professional* [@agisoftllc2021], une orthomosaïque a été générée par mission de vol. Ce produit est « une image unique à haute résolution obtenue par la fusion de toutes les photos collectées lors d'un recensement d'une zone donnée » [traduction libre] [@ferrari2021]. Dans ce logiciel, mais aussi pour l'ensemble des analyses spatiales effectuées après coup, le datum de référence ayant été choisi est le système canadien de référence spatiale, soit NAD83 (SCRS) époque 1997 (aussi appelé version 2), et la projection est la Mercator Transverse Modifiée (MTM) pour le fuseau 8 (EPSG : 2950).
 
-Ces vols de drone ont permis de survoler environ 43 hectares de forêt, se divisant en zones 1, 2 et 3. Un inventaire exhaustif des arbres a été réalisé par une équipe de terrain constituée de Myriam ainsi que trois auxiliaires de recherche au cours du même été. Celle-ci a procédé au géoréférencement, à l'identification et à l'annotation de chacun des arbres atteignant la canopée et, donc, étant visible sur les orthomosaïques produites. Ces annotations consistent en des polygones d'arbres ayant été tracés à la main à l'aide d'une surface à dessin et du logiciel *ArcGIS Pro* [@esriinc2022] afin de délimiter les couronnes d'arbres. Ainsi, il en résulte un énorme tableau de variables réponses dont chacune des entités du tableau représente un arbre géoréférencé ayant été identifié à l'espèce sur le terrain. La Figure A2 (Annexe 1) permet représenter les différentes composantes spatiales du plan d'échantillonnage.
+Ces vols de drone ont permis de survoler environ 43 hectares de forêt, se divisant en zones 1, 2 et 3. Un inventaire exhaustif des arbres a été réalisé par une équipe de terrain constituée de Myriam ainsi que trois auxiliaires de recherche au cours du même été. Celle-ci a procédé au géoréférencement, à l'identification et à l'annotation de chacun des arbres atteignant la canopée et, donc, étant visible sur les orthomosaïques produites. Ces annotations consistent en des polygones d'arbres ayant été tracés à la main à l'aide d'une surface à dessin et du logiciel *ArcGIS Pro* [@esriinc2022] afin de délimiter les couronnes d'arbres. Ainsi, il en résulte un énorme tableau de variables réponses dont chacune des entités du tableau représente un arbre géoréférencé ayant été identifié à l'espèce sur le terrain. La Figure 2 (Annexe 1) permet représenter les différentes composantes spatiales du plan d'échantillonnage.
 
 ## Tableaux de données
 
 ### Arbres inventoriés
 
-Pour ce travail de session, l'aire d'étude considérée se limitera à la zone 1, représentant une superficie d'environ 20 hectares. Après le nettoyage des données, le jeu de données comportant les entités relatives aux polygones des arbres de cette zone compte 9818 lignes et quatre colonnes (Tableau 2). Chaque individu est accompagné d'un identifiant unique, d'un code d'espèce, des coordonnées projetées du polygone (mètres) et de la surface occupée par sa couronne (m^2^). Au total, 17 essences d'arbres sont présentes, dont une catégorie regroupant toutes les espèces d'épinettes inventoriées; toutes les autres catégories sont des espèces d'arbres. Les différentes espèces d'épinettes ont été regroupées au genre, et non à l'espèce, étant donné qu'elles s'hybrident fréquemment entre elles et, donc, que les erreurs d'identification sont beaucoup plus fréquentes au sein de ce genre.
+Pour ce travail de session, l'aire d'étude considérée se limitera à la zone 1, représentant une superficie d'environ 20 hectares. Après le nettoyage des données, le jeu de données comportant les entités relatives aux polygones des arbres de cette zone compte 9818 lignes et quatre colonnes (Table 2). Chaque individu est accompagné d'un identifiant unique, d'un code d'espèce, des coordonnées projetées du polygone (mètres) et de la surface occupée par sa couronne (m^2^). Au total, 17 essences d'arbres sont présentes, dont une catégorie regroupant toutes les espèces d'épinettes inventoriées; toutes les autres catégories sont des espèces d'arbres. Les différentes espèces d'épinettes ont été regroupées au genre, et non à l'espèce, étant donné qu'elles s'hybrident fréquemment entre elles et, donc, que les erreurs d'identification sont beaucoup plus fréquentes au sein de ce genre.
 
 ```{r Importation et nettoyage des données darbres, echo=FALSE}
 #### Importation et nettoyage des données d'arbres (type sf) ----
@@ -134,54 +134,48 @@ table2 <- head(Z1_polygones) %>%
   rename('Superficie' = 'surf_m2',
          `Code d'espèce` = 'Label',
          'Géométrie' = geometry)
-knitr::kable(table2,
- caption = "Tableau 2 : Polygones des arbres inventoriés dans la zone 1 de la Station de biologie des Laurentides")
+knitr::kable(table2, align = "cccc",
+ caption = "Polygones des arbres inventoriés dans la zone 1 de la Station de biologie des Laurentides")
 ```
 
 ### Placettes forestières
 
-Afin de représenter les normes des placettes forestières réalisées lors des inventaires forestiers gouvernementaux, l'orthomosaïque sur laquelle les polygones d'arbres ont été tracés a été découpée en placettes de 20 m × 20 m à l'aide d'une grille. Cette opération a été effectuée à l'aide d'objets de type « sf » afin de conserver les coordonnées des centroïdes de chacune d'entre elles. Par la suite, un tableau regroupant les placettes ainsi que leurs coordonnées projetées a alors être créé. Dès lors, une sélection a été réalisée de sorte à ne conserver que les placettes ayant plus de 40% de leur superficie annotée pour n'avoir que celles étant représentatives d'une forêt naturelle. Cette opération a alors permis d'éliminer les limites des annotations ainsi que quelques placettes étant traversées par des sentiers de randonnée. Enfin, 402 placettes géoréférencées ont été prises en compte dans les analyses, comportant au total 8917 arbres. Le Tableau 3 présente les coordonnées des placettes forestières.
+Afin de représenter les normes des placettes forestières réalisées lors des inventaires forestiers gouvernementaux, l'orthomosaïque sur laquelle les polygones d'arbres ont été tracés a été découpée en placettes de 20 m × 20 m à l'aide d'une grille. Cette opération a été effectuée à l'aide d'objets de type « sf » afin de conserver les coordonnées des centroïdes de chacune d'entre elles. Par la suite, un tableau regroupant les placettes ainsi que leurs coordonnées projetées a alors être créé. Dès lors, une sélection a été réalisée de sorte à ne conserver que les placettes ayant plus de 40% de leur superficie annotée pour n'avoir que celles étant représentatives d'une forêt naturelle. Cette opération a alors permis d'éliminer les limites des annotations ainsi que quelques placettes étant traversées par des sentiers de randonnée. Enfin, 402 placettes géoréférencées ont été prises en compte dans les analyses, comportant au total 8917 arbres. La Table 3 présente les coordonnées des placettes forestières.
 
 ```{r Visualisation tableau grid_coord, echo=FALSE}
 table3 <- read.csv("../02_outdata/grid_coord.csv") %>%
   rename("X (m)" = X,
          "Y (m)" = Y)
 table3 <- table3[, c(3, 1, 2)] #On réordonne le dataframe pour avoir le grid_id en 1ère colonne
-knitr::kable(head(table3),
- caption = "Tableau 3 : Coordonnées projetées des placettes forestières de la zone 1 de la Station de biologie des Laurentides.")
+knitr::kable(head(table3), align = "ccc",
+ caption = "Coordonnées projetées des placettes forestières de la zone 1 de la Station de biologie des Laurentides.")
 ```
 
 ### Abondances d'espèces d'arbres
 
-Par conséquent, chacun des arbres géoréférencés a ensuite pu être associé à sa placette respective à l'aide d'une jointure spatiale, toujours en conservant les objets en type « sf ». Deux jointures spatiales ont été réalisées : une première pour ajouter une colonne indiquant la placette dans laquelle chaque individu se retrouve, puis une deuxième pour obtenir un tableau d'abondance des essences d'arbres par placette (Tableau 4).
+Par conséquent, chacun des arbres géoréférencés a ensuite pu être associé à sa placette respective à l'aide d'une jointure spatiale, toujours en conservant les objets en type « sf ». Deux jointures spatiales ont été réalisées : une première pour ajouter une colonne indiquant la placette dans laquelle chaque individu se retrouve, puis une deuxième pour obtenir un tableau d'abondance des essences d'arbres par placette (Table 4).
 
 ```{r Visualisation tableau spe, echo=FALSE}
 table4 <- read.csv("../02_outdata/spe.csv", row.names=1)
 knitr::kable(head(table4),
- caption = "Tableau 4 : Composition en espèces des placettes forestières de la zone 1 de la Station de biologie des Laurentides.", row.names = TRUE)
+ caption = "Composition en espèces des placettes forestières de la zone 1 de la Station de biologie des Laurentides.", row.names = TRUE)
 ```
 
 ### Variables topographiques
 
-La matrice explicative est constituée de cinq variables topographiques : l'élévation topographique (mètres), la pente (%), son orientation (représenté par le degré d'exposition vers l'Est et vers le Nord; radians) ainsi que l'indice d'humidité topographique (quantitatif; sans unité). Toutes ces variables sont extraites ou calculées à partir des produits dérivés du LiDAR provenant des données écoforestières du @ministèredesforêtsdelafauneetdesparcs;@ministèredesforêtsdelafauneetdesparcsa . Initialement, elles étaient toutes représentées à l'aide de données matricielles, il a donc été nécessaire d'extraire la moyenne des valeurs de ces variables pour chacune des placettes 20 × 20 m.
+La matrice explicative est constituée de cinq variables topographiques : l'élévation topographique (mètres), la pente (%), son orientation (représenté par le degré d'exposition vers l'Est et vers le Nord; radians) ainsi que l'indice d'humidité topographique (quantitatif; sans unité) (Table 5). Toutes ces variables sont extraites ou calculées à partir des produits dérivés du LiDAR provenant des données écoforestières du @ministèredesforêtsdelafauneetdesparcs;@ministèredesforêtsdelafauneetdesparcsa. Initialement, elles étaient toutes représentées à l'aide de données matricielles, il a donc été nécessaire d'extraire la moyenne des valeurs de ces variables pour chacune des placettes 20 × 20 m.
 
-L'élévation et l'indice d'humidité topographique ont été directement extraits des produits dérivés LiDAR, respectivement du modèle numérique de terrain (MNT) et de l'indice d'humidité topographique (TWI). La pente a été obtenue à l'aide d'une fonction *slope* (Dorman, 2021) appliquée sur le MNT, donnant alors une pente en degrés (0-360°). Puis, étant donné que les valeurs étaient toutes situées dans le premier quadrant (0-90°), il a été possible de rapporter ces valeurs sur 100 afin d'obtenir un pourcentage d'inclinaison. Concernant les variables d'orientation de pente, les degrés d'exposition (*eastness*/*northness exposure*) découlent directement des variables intermédiaires d'orientation vers l'Est et le Nord (*eastness*/*northness*).
+L'élévation et l'indice d'humidité topographique ont été directement extraits des produits dérivés LiDAR, respectivement du modèle numérique de terrain (MNT) et de l'indice d'humidité topographique (TWI). La pente a été obtenue à l'aide d'une fonction *slope* [@dorman2021] appliquée sur le MNT, donnant alors une pente en degrés (0-360°). Puis, étant donné que les valeurs étaient toutes situées dans le premier quadrant (0-90°), il a été possible de rapporter ces valeurs sur 100 afin d'obtenir un pourcentage d'inclinaison. Concernant les variables d'orientation de pente, les degrés d'exposition (*eastness*/*northness exposure*) découlent directement des variables intermédiaires d'orientation vers l'Est et le Nord (*eastness*/*northness*).
 
-La matrice explicative est constituée de cinq variables topographiques : l'élévation topographique (unités : mètres), la pente (unités : %), son orientation (représenté par eastness et northness exposure; unités : radians) ainsi que l'indice d'humidité topographique (quantitatif; sans unité). Toutes ces variables sont extraites ou calculées à partir des produits dérivés du LiDAR provenant des données écoforestières du Ministère des Forêts, de la Faune et des Parcs (MFFP). Initialement, elles étaient toutes représentées à l'aide de données matricielles, il a donc été nécessaire d'extraire la moyenne des valeurs de ces variables pour chacune des placettes 20 x 20 m.
+Pour ce faire, une fonction *aspect* [@dorman2021] indiquant la direction (en degrés, 0-360°) vers laquelle la pente fait face a été appliquée sur le MNT, puis le tout a été transformé en radians. Étant une variable circulaire, les transformations trigonométriques $sin(\theta)$ et $cos(\theta)$ ont ensuite été appliquées sur la variable *aspect* [@legendre2009].
 
-Pour ce faire, une fonction *aspect* (Dorman, 2021) indiquant la direction (en degrés, 0-360°) vers laquelle la pente fait face a été appliquée sur le MNT, puis le tout a été transformé en radians. Étant une variable circulaire, les transformations trigonométriques $sin(ϴ)$ et $cos(ϴ)$ ont ensuite été appliquées sur la variable *aspect* (Legendre et al., 2009).
+Les variables *eastness* et *northness* ont donc été calculées selon les équations suivantes :
 
-Les variables *eastness* et *northness* ont donc été calculées selon les équations suivantes :\
+$$eastness = sin(aspect(mnt) * \pi / 180)$$ $$northness = cos(aspect(mnt) * \pi / 180)$$
 
-$eastness = sin(aspect(mnt) * π / 180)$\
-$northness = cos(aspect(mnt) * π / 180)$
+Puis, celles-ci ont été mises en relation avec la pente en radians afin de mieux représenter la topographie sur le territoire [@piedallu2008; @pierce2005].
 
-Puis, celles-ci ont été mises en relation avec la pente en radians afin de mieux représenter la topographie sur le territoire [@piedallu2008; @pierce2005].\
-
-$pente = (slope(mnt) * π) / 180$\
-et\
-$eastness exposure = sin(pente)*eastness$\
-$northness exposure = sin(pente)*northness$
+$$pente = (slope(mnt) * \pi) / 180$$ et $$eastness exposure = sin(pente)*eastness$$ $$northness exposure = sin(pente)*northness$$
 
 ```{r Visualisation tableau grid_topo, echo=FALSE}
 # Importation des placettes forestières avec var. environnementales
@@ -195,8 +189,8 @@ table5 <- table5[, c(1, 6, 5, 7, 10, 11)] %>% #On réordonne le dataframe pour a
          'Eastness exposure' = eastness_exp,
          'Northness exposure' = northness_exp)
 
-knitr::kable(head(table5),
- caption = "Tableau 5 : Variables topographiques relatives à chacune des placettes forestières de la zone 1 de la Station de biologie des Laurentides.")
+knitr::kable(head(table5), align = "cccccc",
+ caption = "Variables topographiques relatives à chacune des placettes forestières de la zone 1 de la Station de biologie des Laurentides.")
 ```
 
 # Méthodes
@@ -207,18 +201,26 @@ Avant toute analyse, il faut d'abord procéder aux transformations des différen
 
 Puis, plusieurs analyses statistiques, par exemple l'analyse en composantes principales (ACP) et l'analyse de redondance (RDA), requièrent que les données respectent la distance Euclidienne [@legendre1999; @legendre2012]. Or, celle-ci n'est pas adaptée aux données d'abondances brutes, notamment en raison de la présence du « problème du double zéro ». Lorsque l'on compare la composition en espèces de différentes placettes d'inventaire, la présence d'une même espèce sur deux placettes suggère qu'elles ont probablement des conditions similaires. Cependant, lorsque deux placettes n'ont aucune espèce en commun, cela ne témoigne pas d'une similitude entre elles, car cela pourrait être dû à de nombreux facteurs autres que l'absence d'une niche écologique appropriée pour cette espèce. La distance Euclidienne ne permet pas de prendre en considération ces doubles absences. Ainsi, pour les données d'abondances d'espèces, il est souvent préférable d'utiliser des mesures de distance alternatives. [@legendre2001; @legendre2012]
 
-Étant donné que de nombreuses mesures peuvent être utilisées pour régler ce problème, les données issues de différentes transformations ont été mises en relation avec les variables environnementales au moyen d'une ordination canonique afin de déterminer celle permettant d'expliquer la plus grande proportion de la variance. Après la comparaison des R2 ajustés (Tableau 6), la transformation log-Chorde a été choisie pour être appliquée sur les données d'abondances brutes.
+Étant donné que de nombreuses mesures peuvent être utilisées pour régler ce problème, les données issues de différentes transformations ont été mises en relation avec les variables environnementales au moyen d'une ordination canonique afin de déterminer celle permettant d'expliquer la plus grande proportion de la variance. Après la comparaison des R2 ajustés (Table 6), la transformation log-Chorde a été choisie pour être appliquée sur les données d'abondances brutes.
 
 ```{r tableau transformations, echo=FALSE}
 transfo.R2aj <- read.csv("../02_outdata/transfo.R2aj.csv") %>%
-  rename(`R2 ajusté` = "R2ajusté")
-knitr::kable(transfo.R2aj,
- caption = "Tableau 6 : Proportion de la variance des données d’espèces d’arbres inventoriées au sein des placettes forestières de la zone 1 de la Station de biologie des Laurentides expliquée les variables environnementales.", row.names = FALSE, digits = 4)
+  rename(`R^2^ ajusté` = "R2ajusté")
+knitr::kable(transfo.R2aj, align = "lc",
+ caption = "Proportion de la variance des données d’espèces d’arbres inventoriées au sein des placettes forestières de la zone 1 de la Station de biologie des Laurentides expliquée les variables environnementales.", row.names = FALSE, digits = 4)
 ```
 
 ## Groupement en communautés écoforestières
 
+Afin de séparer les placettes forestières en communautés, une analyse de groupement avec contrainte de contiguïté spatiale a été réalisée pour 3, 4 et 5 groupes. L'avantage de cette analyse de groupement est qu'elle permet d'identifier les groupes de placettes forestières d'une même communauté tout en considérant leur composante spatiale.
+
+La liste des liens de connectivité entre les placettes forestières a été obtenue par une triangulation de Delauney à partir de laquelle les liens d'une longueur de plus de 30 mètres ont été retirés afin de ne conserver que les liens des placettes forestières côte-à-côtes [@guénard2022]. Par la suite, les placettes forestières ont été regroupées avec la méthode de Ward en utilisant la matrice de distance euclidienne ayant subi une transformation de log-Chorde. Cette méthode de groupement agglomératif hiérarchique a pour objectif de minimiser la somme des carrés des écarts des groupes créés [@legendre2012]. En d'autres termes, elle permet de créer des groupes de placettes forestières similaires en minimisant la variabilité entre les placettes dans chaque groupe.
+
+Après l'analyse de groupement avec contrainte de contiguïté spatiale, les superficies relatives des espèces au sein de chacun des groupes ont été calculées, puis transposées dans des histogrammes de sorte à déterminer les espèces dominantes et, ainsi, nommer les communautés écoforestières.
+
 ## Ordination simple (analyse en composantes principales)
+
+Étant donné que le jeu de données en est un d'abondances d'espèces, l'analyse en composantes principales (ACP) est appropriée pour cette étude. L'analyse des correspondances (AFC) serait, elle aussi, appropriée, mais elle donne davantage de poids aux espèces rares qu'aux espèces communes, ce qui n'est pas réellement l'objectif pour le groupement des communautés écoforestières, car celles-ci sont définies en fonction des espèces les plus abondances, et non en fonction de la spécificité de certaines espèces à se retrouver dans certaines placettes écoforestières. L'ACP est donc l'ordination simple de choix. L'interprétation de l'analyse en composantes principales en cadrage 1 est particulièrement pertinente pour observer les espèces ayant contribué le plus à la formation des communautés écoforestières. De plus, en cadrage 1, les stations près les unes des autres sont similaires entre elles au niveau de leur composition en espèces d'arbres. Par ailleurs, tout comme les analyses précédentes, l'ordination a été réalisée sur les données transformées à l'aide de la transformation de log-Chorde de sorte à conserver les distances entre les éléments. [@borcard2018; @legendre2012]
 
 ## Ordination canonique (analyse de redondance)
 
@@ -230,19 +232,37 @@ knitr::kable(transfo.R2aj,
 
 ## Ordination canonique
 
+\newpage
+
 # Références
 
 ::: {#refs}
 :::
 
+\newpage
+
 # Annexe 1 : Figures supplémentaires
 
-![Figure A1 : Carte des limites de la Station de biologie des Laurentides](../03_figs/FigureA1.png)
+![Carte des limites de la Station de biologie des Laurentides.](../03_figs/Figure1.png){width="15cm"}
 
-![Figure A2: Localisation de l'aire d'étude. a : Carte des limites de la Station de biologie des Laurentides. La rectangle orange cible les zones 1, 2 et 3. b : Carte de l'ensemble des trois zones. Le rectangle marron cible la zone 1. c : Une partie des polygones de couronnes d'arbres annotés dans ArcGIS Pro.](../03_figs/FigureA2.png)
+\newpage
 
-![Figure A3: Superficies relatives des espèces d'arbres selon leur communauté, pour trois communautés écoforestières.](../03_figs/graph_comm3.png)
+![Localisation de l'aire d'étude. a : Carte des limites de la Station de biologie des Laurentides. La rectangle orange cible les zones 1, 2 et 3. b : Carte de l'ensemble des trois zones. Le rectangle marron cible la zone 1. c : Une partie des polygones de couronnes d'arbres annotés dans ArcGIS Pro.](../03_figs/Figure2.png){width="15cm"}
 
-![Figure A4: Superficies relatives des espèces d'arbres selon leur communauté, pour quatre communautés écoforestières.](../03_figs/graph_comm4.png)
+![Groupements des placettes forestières de la zone 1 de la Station de biologie des Laurentides en 3, 4 et 5 communautés écoforestières (402 placettes).](../03_figs/Figure3.png){width="15cm"}
 
-![Figure A5: Superficies relatives des espèces d'arbres selon leur communauté, pour cinq communautés écoforestières.](../03_figs/graph_comm5.png)
+\newpage
+
+![Superficies relatives des espèces d'arbres selon leur communauté, pour trois communautés écoforestières.](../03_figs/graph_comm3.png){width="15cm"}
+
+![Superficies relatives des espèces d'arbres selon leur communauté, pour quatre communautés écoforestières.](../03_figs/graph_comm4.png){width="12cm"}
+
+![Superficies relatives des espèces d'arbres selon leur communauté, pour cinq communautés écoforestières.](../03_figs/graph_comm5.png){width="15cm"}
+
+![Carte des communautés écoforestières de la zone 1 située sur la rive ouest du Lac Croche de la Station de biologie des Laurentides.](../03_figs/carte_3comm.png){width="15cm"}
+
+\newpage
+
+![Analyse en composantes principales des données des espèces d'arbres inventoriées au sein des placettes forestières de la zone 1 de la Station de biologie des Laurentides (17 classes d'arbres, 402 placettes).](../03_figs/ACP_3comm.png){width="15cm"}
+
+![Analyse de redondance mettant en relation les données des espèces d'arbres inventoriées au sein des placettes forestières de la zone 1 de la Station de biologie des Laurentides et les variables topographiques (5 variables).](../03_figs/RDA_triplot.rda.lc.modif.png)
