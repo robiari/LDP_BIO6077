@@ -3,6 +3,8 @@ title: "Succession forestière après feu: Où la forêt en est-elle rendue 100 
 author: "Ariane Roberge"
 date: "2023-09-19"
 output: pdf_document
+bibliography: references.bib
+csl: nature_doublespaced.csl
 ---
 
 ```{r setup, include=FALSE}
@@ -58,7 +60,9 @@ Example: Though there is strong evidence to suggest that sugar affects taste pre
 More info: The description should be no longer than the length of an abstract. It can give some context for the proposed study, but great detail is not needed here for your preregistration. 
 -->
 ```
-Enter a description of your study here.
+Natural and anthropogenic disturbances such as fire, logging and insect epidemics have a significant impact on population dynamics in forest ecosystems. These disturbances can lead to changes not only in species abundance and composition, but also in forest structure and ecosystem functions [@kuuluvainen2021; @viljur2022]. Secondary succession is an ecological process that can occur after a major disturbance in a forest. Plant communities recover gradually, starting with the establishment of pioneer species, mostly shade intolerant [@finegan1984]. Over time, these give way to more tolerant species such as sugar maple and American beech [@burns1990; @nolet2008]. This process leads to the formation of more mature and stable species communities, which eventually reach a state of equilibrium known as climax [@horn1974]. In Quebec, the territory is divided into bioclimatic domains corresponding to late-successional stands in mesic environments [@ministèredesressourcesnaturellesetdesforêts2022].
+
+The study area, located on the west shore of Lac Croche at the Station de biologie des Laurentides (SBL) of the Université de Montréal, is in the bioclimatic range of the yellow birch maple stand [@ministèredesressourcesnaturellesetdesforêts2022]. However, it has been found that yellow birch maple stands are practically non-existent on the territory [@savage2001]. Interesting questions then arise... If the ecoforest communities are not yellow birch maple stands, what are they? What ecological processes are responsible for the composition of ecoforest communities in the study area? At what spatial scales do they operate?
 
 ### 4. Hypotheses
 
@@ -69,7 +73,7 @@ List specific, concise, and testable hypotheses. Please state if the hypotheses 
 Example: If taste affects preference, then mean preference indices will be higher with higher concentrations of sugar. 
 -->
 ```
-1.  List any *a priori* hypotheses here.
+This was an exploratory study. No specific hypotheses were made *a priori*.
 
 ## Design Plan
 
@@ -116,7 +120,13 @@ Example: We have a between subjects design with 1 factor (sugar by mass) with 4 
 More info: This question has a variety of possible answers. The key is for a researcher to be as detailed as is necessary given the specifics of their design. Be careful to determine if every parameter has been specified in the description of the study design. There may be some overlap between this question and the following questions. That is OK, as long as sufficient detail is given in one of the areas to provide all of the requested information. For example, if the study design describes a complete factorial, 2 X 3 design and the treatments and levels are specified previously, you do not have to repeat that information. 
 -->
 ```
-Describe your study design here.
+During the summer of 2021, as part of Myriam Cloutier's Master's project, a student in Etienne Laliberté's Plant Functional Ecology Laboratory (LEFO), high-resolution RGB imagery was acquired by drone on several occasions over SBL. Flights were carried out every month from May to October using the *DJI Phantom 4 RTK* to obtain images showing the phenological changes in the trees throughout the season.. Then, using *Agisoft Metashape Professional* photogrammetry software [@agisoftllc2021], an orthomosaic was generated for each flight mission. During the summer of 2021, as part of the Master's project of Myriam Cloutier, a student in Etienne Laliberté's Plant Functional Ecology Laboratory (LEFO), high-resolution RGB imagery was acquired by drone on several occasions over SBL. In this software, but also for all the spatial analyses carried out afterwards, the reference datum chosen is the Canadian Spatial Reference System, NAD83 (CSRS) epoch 1997 (also known as version 2), and the projection is the Modified Transverse Mercator (MTM) for zone 8 (EPSG: 2950).
+
+These drone flights covered around 43 hectares of forest, divided into zones 1, 2 and 3. An exhaustive tree inventory was carried out by a field team led by Myriam and three research assistants during the same summer. They geo-referenced, identified and annotated every tree reaching the canopy, and therefore visible on the orthomosaics produced. These annotations consist of tree polygons that were hand-drawn using a drawing surface and *ArcGIS Pro software* [@esriinc2022] to delineate tree crowns.
+
+Figure 1 (Appendix 1) shows the various spatial components of the sampling design.
+
+For the purposes of this project, the study area will be limited to zone 1, covering an area of around 20 hectares.
 
 ### 9. Randomization
 
@@ -160,7 +170,7 @@ Example: An appropriate instance of using existing data would be collecting a sa
 More info: An appropriate instance of using existing data would be collecting a sample size much larger than is required for the study, using a small portion of it to conduct exploratory analysis, and then registering one particular analysis that showed promising results. After registration, conduct the specified analysis on that part of the dataset that had not been investigated by the researcher up to that point. 
 -->
 ```
-Describe any existing data or state not applicable.
+Unfortunately, this pre-registration form was completed after the study. The data has therefore already been analyzed at this stage. However, I can confirm that the data had not already been explored prior to this study.
 
 ### 12. Data collection procedures
 
@@ -173,7 +183,11 @@ Example: Participants will be recruited through advertisements at local pastry s
 More information: The answer to this question requires a specific set of instructions so that another person could repeat the data collection procedures and recreate the study population. Alternatively, if the study population would be unable to be reproduced because it relies on a specific set of circumstances unlikely to be recreated (e.g., a community of people from a specific time and location), the criteria and methods for creating the group and the rationale for this unique set of subjects should be clear. 
 -->
 ```
-Enter a description of your data collection procedures here.
+During the summer 2021, high-resolution RGB imagery was acquired by drone on several occasions over SBL. These drone flights covered around 43 hectares of forest, divided into zones 1, 2 and 3.
+
+Flights were carried out every month from May to October using the *DJI Phantom 4 RTK*. Then, using *Agisoft Metashape Professional* photogrammetry software [@agisoftllc2021], an orthomosaic was generated for each flight mission.
+
+An exhaustive tree inventory was carried out by a field team during the same summer. They geo-referenced, identified and annotated every tree reaching the canopy, and therefore visible on the orthomosaics produced. These annotations consist of tree polygons that were hand-drawn using a drawing surface and *ArcGIS Pro software* [@esriinc2022] to delineate tree crowns.
 
 ### 13. Sample size
 
@@ -186,7 +200,11 @@ Example: Our target sample size is 280 participants. We will attempt to recruit 
 More information: For some studies, this will simply be the number of samples or the number of clusters. For others, this could be an expected range, minimum, or maximum number. 
 -->
 ```
-Enter a description of your sample size here.
+Drone flights covered around 43 hectares of forest, divided into zones 1, 2 and 3. For this work, we only used zone 1.
+
+In order to represent the standards of the forest plots produced during government forest inventories, the orthomosaic on which the tree polygons were plotted was cut into 20 m × 20 m plots using a grid. 402 georeferenced plots were included in the analyses, including a total of 8917 trees.
+
+For the cluster analysis aiming to determine the number of tree communities, we plan on having between 3 to 6 clusters.
 
 ### 14. Sample size rationale
 
@@ -199,7 +217,7 @@ Example: We used the software program G*Power to conduct a power analysis. Our g
 More information: This gives you an opportunity to specifically state how the sample size will be determined. A wide range of possible answers is acceptable; remember that transparency is more important than principled justifications. If you state any reason for a sample size upfront, it is better than stating no reason and leaving the reader to “fill in the blanks.” Acceptable rationales include: a power analysis, an arbitrary number of subjects, or a number based on time or monetary constraints. 
 -->
 ```
-Enter your sample size rationale here.
+The area overflown by the drone during the flights was determined according to the visual limit in order to see the drone at all times during the flights. From a legal point of view, it is necessary to be able to see the drone at all times.
 
 ### 15. Stopping rule
 
@@ -212,7 +230,7 @@ Example: We will post participant sign-up slots by week on the preceding Friday 
 More information: You may specify a stopping rule based on p-values only in the specific case of sequential analyses with pre-specified checkpoints, alphas levels, and stopping rules. Unacceptable rationales include stopping based on p-values if checkpoints and stopping rules are not specified. If you have control over your sample size, then including a stopping rule is not necessary, though it must be clear in this question or a previous question how an exact sample size is attained. 
 -->
 ```
-Enter your stopping rule here or state not applicable.
+-   Not applicable.
 
 ## Variables
 
@@ -232,7 +250,7 @@ Example: We manipulated the percentage of sugar by mass added to brownies. The f
 More information: For any experimental manipulation, you should give a precise definition of each manipulated variable. This must include a precise description of the levels at which each variable will be set, or a specific definition for each categorical treatment. For example, “loud or quiet,” should instead give either a precise decibel level or a means of recreating each level. 'Presence/absence' or 'positive/negative' is an acceptable description if the variable is precisely described.
 -->
 ```
-Describe manipulated variables here or state not applicable.
+-   Not applicable.
 
 ### 17. Measured variables
 
@@ -245,7 +263,23 @@ Example: The single outcome variable will be the perceived tastiness of the sing
 More information: Observational studies and meta-analyses will include only measured variables. As with the previous questions, the answers here must be precise. For example, 'intelligence,' 'accuracy,' 'aggression,' and 'color' are too vague. Acceptable alternatives could be 'IQ as measured by Wechsler Adult Intelligence Scale' 'percent correct,' 'number of threat displays,' and 'percent reflectance at 400 nm.'
 -->
 ```
-Describe your measured variables here.
+The explanatory matrix consists of five topographic variables: topographic elevation (meters), slope (%), slope orientation (represented by degree of exposure to the east and north; radians) and topographic wetness index (quantitative; unitless). All these variables are extracted or calculated from LiDAR-derived products from the @ministèredesforêtsdelafauneetdesparcs; @ministèredesforêtsdelafauneetdesparcs ecoforestry data . Initially, they were all represented using raster data, so it was necessary to extract the average of the values of these variables for each of the 20 × 20 m plots.
+
+Elevation and topographic wetness index were extracted directly from LiDAR products, respectively from the digital terrain model (DTM) and the topographic wetness index (TWI). The slope was obtained using a *slope* function [@dorman2021] applied to the DTM, then giving a slope in degrees (0-360°). Then, given that the values were all located in the first quadrant (0-90°), it was possible to report these values out of 100 to obtain a slope percentage. For the slope orientation variables, the degrees of exposure (*eastness*/*northness exposure*) were derived directly from the intermediate variables of east and north orientation (*eastness*/*northness*).
+
+To do this, an *aspect* function [@dorman2021] indicating the direction (in degrees, 0-360°) towards which the slope faces was applied to the DTM, then transformed into radians. Being a circular variable, the trigonometric transformations $sin(\theta)$ and $cos(\theta)$ were then applied to the *aspect* variable [@legendre2009].
+
+The *eastness* and *northness* variables were then calculated according to the following equations:
+
+$$eastness = sin(aspect(mnt) * \pi / 180)$$
+$$northness = cos(aspect(mnt) * \pi / 180)$$
+
+These were then related to the slope in radians in order to better represent the topography of the territory [@piedallu2008; @pierce2005].
+
+$$pente = (slope(mnt) * \pi) / 180$$
+et
+$$eastness exposure = sin(pente)*eastness$$
+$$northness exposure = sin(pente)*northness$$
 
 ### 18. Indices
 
@@ -322,7 +356,7 @@ Example: No checks will be performed to determine eligibility for inclusion besi
 More information: Any rule for excluding a particular set of data is acceptable. One may describe rules for excluding a participant or for identifying outlier data.
 -->
 ```
--   Not applicable.
+In order to represent the standards of the forest plots produced during government forest inventories, the orthomosaic on which the tree polygons were plotted was cut into 20 m × 20 m plots using a grid. A selection was then made so as to retain only plots with more than 40% of their area annotated, in order to have only those that were representative of a natural forest. This operation eliminated the boundaries of the annotations, as well as a few plots crossed by hiking trails.
 
 ### 23. Missing data
 
@@ -346,7 +380,7 @@ If you plan to explore your data set to look for unexpected differences or relat
 Example: We expect that certain demographic traits may be related to taste preferences. Therefore, we will look for relationships between demographic variables (age, gender, income, and marital status) and the primary outcome measures of taste preferences.
 -->
 ```
-Enter any plans for exploratory data analysis here or state not applicable.
+This was an exploratory study as a whole, so no section was identified as an exploratory analysis specifically.
 
 ## Other
 
@@ -359,6 +393,15 @@ If there is any additional information that you feel needs to be included in you
 ```
 -   Not applicable.
 
+\newpage
+
 ## References
 
-Enter any references used throughout the text here.
+::: {#refs}
+:::
+
+\newpage
+
+## Appendix 1. Figures
+
+![Location of the study area. a : Boundary map of the Station de biologie des Laurentides. The orange rectangle targets zones 1, 2 and 3. b: Map of all three zones. The brown rectangle targets zone 1. c: Part of the tree crown polygons annotated in *ArcGIS Pro*.](../03_figs/FigureA2.png)

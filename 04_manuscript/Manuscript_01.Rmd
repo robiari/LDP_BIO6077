@@ -163,25 +163,19 @@ knitr::kable(head(table4),
 
 ### Variables topographiques
 
-La matrice explicative est constituée de cinq variables topographiques : l'élévation topographique (mètres), la pente (%), son orientation (représenté par le degré d'exposition vers l'Est et vers le Nord; radians) ainsi que l'indice d'humidité topographique (quantitatif; sans unité). Toutes ces variables sont extraites ou calculées à partir des produits dérivés du LiDAR provenant des données écoforestières du @ministèredesforêtsdelafauneetdesparcs;@ministèredesforêtsdelafauneetdesparcsa . Initialement, elles étaient toutes représentées à l'aide de données matricielles, il a donc été nécessaire d'extraire la moyenne des valeurs de ces variables pour chacune des placettes 20 × 20 m.
+La matrice explicative est constituée de cinq variables topographiques : l'élévation topographique (mètres), la pente (%), son orientation (représenté par le degré d'exposition vers l'Est et vers le Nord; radians) ainsi que l'indice d'humidité topographique (quantitatif; sans unité). Toutes ces variables sont extraites ou calculées à partir des produits dérivés du LiDAR provenant des données écoforestières du @ministèredesforêtsdelafauneetdesparcs;@ministèredesforêtsdelafauneetdesparcsa. Initialement, elles étaient toutes représentées à l'aide de données matricielles, il a donc été nécessaire d'extraire la moyenne des valeurs de ces variables pour chacune des placettes 20 × 20 m.
 
-L'élévation et l'indice d'humidité topographique ont été directement extraits des produits dérivés LiDAR, respectivement du modèle numérique de terrain (MNT) et de l'indice d'humidité topographique (TWI). La pente a été obtenue à l'aide d'une fonction *slope* (Dorman, 2021) appliquée sur le MNT, donnant alors une pente en degrés (0-360°). Puis, étant donné que les valeurs étaient toutes situées dans le premier quadrant (0-90°), il a été possible de rapporter ces valeurs sur 100 afin d'obtenir un pourcentage d'inclinaison. Concernant les variables d'orientation de pente, les degrés d'exposition (*eastness*/*northness exposure*) découlent directement des variables intermédiaires d'orientation vers l'Est et le Nord (*eastness*/*northness*).
+L'élévation et l'indice d'humidité topographique ont été directement extraits des produits dérivés LiDAR, respectivement du modèle numérique de terrain (MNT) et de l'indice d'humidité topographique (TWI). La pente a été obtenue à l'aide d'une fonction *slope* [@dorman2021] appliquée sur le MNT, donnant alors une pente en degrés (0-360°). Puis, étant donné que les valeurs étaient toutes situées dans le premier quadrant (0-90°), il a été possible de rapporter ces valeurs sur 100 afin d'obtenir un pourcentage d'inclinaison. Concernant les variables d'orientation de pente, les degrés d'exposition (*eastness*/*northness exposure*) découlent directement des variables intermédiaires d'orientation vers l'Est et le Nord (*eastness*/*northness*).
 
-La matrice explicative est constituée de cinq variables topographiques : l'élévation topographique (unités : mètres), la pente (unités : %), son orientation (représenté par eastness et northness exposure; unités : radians) ainsi que l'indice d'humidité topographique (quantitatif; sans unité). Toutes ces variables sont extraites ou calculées à partir des produits dérivés du LiDAR provenant des données écoforestières du Ministère des Forêts, de la Faune et des Parcs (MFFP). Initialement, elles étaient toutes représentées à l'aide de données matricielles, il a donc été nécessaire d'extraire la moyenne des valeurs de ces variables pour chacune des placettes 20 x 20 m.
+Pour ce faire, une fonction *aspect* [@dorman2021b] indiquant la direction (en degrés, 0-360°) vers laquelle la pente fait face a été appliquée sur le MNT, puis le tout a été transformé en radians. Étant une variable circulaire, les transformations trigonométriques $sin(\theta)$ et $cos(\theta)$ ont ensuite été appliquées sur la variable *aspect* [@legendre2009].
 
-Pour ce faire, une fonction *aspect* (Dorman, 2021) indiquant la direction (en degrés, 0-360°) vers laquelle la pente fait face a été appliquée sur le MNT, puis le tout a été transformé en radians. Étant une variable circulaire, les transformations trigonométriques $sin(ϴ)$ et $cos(ϴ)$ ont ensuite été appliquées sur la variable *aspect* (Legendre et al., 2009).
+Les variables *eastness* et *northness* ont donc été calculées selon les équations suivantes :
 
-Les variables *eastness* et *northness* ont donc été calculées selon les équations suivantes :\
+$$eastness = sin(aspect(mnt) * \pi / 180)$$ $$northness = cos(aspect(mnt) * \pi / 180)$$
 
-$eastness = sin(aspect(mnt) * π / 180)$\
-$northness = cos(aspect(mnt) * π / 180)$
+Puis, celles-ci ont été mises en relation avec la pente en radians afin de mieux représenter la topographie sur le territoire [@piedallu2008; @pierce2005].
 
-Puis, celles-ci ont été mises en relation avec la pente en radians afin de mieux représenter la topographie sur le territoire [@piedallu2008; @pierce2005].\
-
-$pente = (slope(mnt) * π) / 180$\
-et\
-$eastness exposure = sin(pente)*eastness$\
-$northness exposure = sin(pente)*northness$
+$$pente = (slope(mnt) * \pi) / 180$$ et $$eastness exposure = sin(pente)*eastness$$ $$northness exposure = sin(pente)*northness$$
 
 ```{r Visualisation tableau grid_topo, echo=FALSE}
 # Importation des placettes forestières avec var. environnementales
