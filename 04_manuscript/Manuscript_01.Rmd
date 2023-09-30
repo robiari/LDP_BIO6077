@@ -224,6 +224,33 @@ Après l'analyse de groupement avec contrainte de contiguïté spatiale, les sup
 
 ## Ordination canonique (analyse de redondance)
 
+Par la suite, afin de mettre en relation les variables topographiques ainsi que la distribution des espèces sur le territoire, une analyse de redondance (RDA), qui est une analyse canonique asymétrique, a été réalisée sur les données brutes transformées (transformation de log-Chorde, comme pour l'ACP) [@legendre2012].
+
+Dans un premier temps, il a été nécessaire de procéder à une sélection des variables explicatives de façon à conserver uniquement celles exerçant une influence significative sur la distribution des espèces. Une sélection ascendante (*forward selection*) a alors été réalisée à l'aide de la fonction *forward.sel* provenant du package *adespatial* [@dray2023] par le biais d'un test permutationnel utilisant 999 permutations.
+
+Pour ce faire, l'algorithme de cette fonction débute avec un modèle réduit, sans variable explicative. Puis, il ajoute une à une les variables de la matrice explicative au modèle, à partir duquel il procède à un test permutationnel de la statistique *F* afin de déterminer la significativité des différentes variables. Il sélectionne alors la plus significative, c'est-à-dire celle avec la *p-value* la plus faible, pour former un modèle amélioré. Il répète ensuite la même procédure en ajoutant des variables une à une au dernier modèle créé, et ce, jusqu'à ce que toutes les variables soient ajoutées ou bien qu'aucune variable restante ne respecte le seuil de significativité établi ($\alpha$ = 0,05). [@narisetty2020]
+
+En résumé, des variables explicatives sont ajoutées au modèle tant et aussi longtemps que l'hypothèse nulle (*H0*) est rejetée :
+
+*H0 : La variable explicative n'influence pas significativement pas la distribution des espèces (p-value \> 0,05).*\
+*H1 : La variable explicative influence significativement la distribution des espèces (p-value* $\leq$ 0,05).
+
+Enfin, une fois que toutes les variables explicatives significatives ont été sélectionnées, il a été possible de procéder à l'analyse de redondance sur ces dernières. Un test global de significativité a ensuite été réalisé sur les résultats de la RDA, puis a été suivi par un test des axes canoniques. Dans les deux cas, il était question d'un test permutationnel de la statistique *F*.
+
+Pour le test global, pour un seuil de significativité $\alpha$ = 0,05 :
+
+*H0 : Il n'y a pas de relation significative entre la distribution des espèces et les variables explicatives (p-value \> 0,05).*\
+*H1 : Il y a une relation significative entre la distribution des espèces et les variables explicatives (p-value* $\leq$ 0,05).
+
+Pour le test sur les axes principaux, pour un seuil de significativité $\alpha$ = 0,05 :
+
+*H0 : L'axe principal n'explique pas la distribution des espèces de façon significative (p-value \> 0,05).*\
+*H1 : L'axe principal explique la distribution des espèces de façon significative (p-value* $\leq$ 0,05).
+
+Il a été décidé de construire les graphiques de l'analyse de redondance avec les « fitted site scores », aussi appelé les « site contraints », de façon à représenter les objets dans la même dimension que les variables explicatives [@legendre2012].
+
+L'analyse de redondance permet de mettre en relation les variables explicatives et la distribution des espèces au sein des placettes, mais elle ne permet pas de considérer les structures spatiales du territoire. Pour un aperçu global des relations, cela est donc adéquat. Il est en revanche possible de pousser l'analyse plus loin en considérant des composantes spatiales de sorte à modéliser les différentes structures spatiales de ce jeu de données.
+
 # Résultats
 
 ## Groupement en communautés écoforestières
@@ -255,7 +282,7 @@ Après l'analyse de groupement avec contrainte de contiguïté spatiale, les sup
 
 ![Superficies relatives des espèces d'arbres selon leur communauté, pour trois communautés écoforestières.](../03_figs/graph_comm3.png){width="15cm"}
 
-![Superficies relatives des espèces d'arbres selon leur communauté, pour quatre communautés écoforestières.](../03_figs/graph_comm4.png){width="12cm"}
+![Superficies relatives des espèces d'arbres selon leur communauté, pour quatre communautés écoforestières.](../03_figs/graph_comm4.png){width="15cm"}
 
 ![Superficies relatives des espèces d'arbres selon leur communauté, pour cinq communautés écoforestières.](../03_figs/graph_comm5.png){width="15cm"}
 

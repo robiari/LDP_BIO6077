@@ -360,7 +360,7 @@ More information: P-values, confidence intervals, and effect sizes are standard 
 -->
 ```
 
-The standard p<0.05 criteria was used to determine if the permutational tests suggested that the results were significantly different from those expected if the null hypothesis were correct. Permutational tests were performed using 999 permutations.
+The standard p $\leq$ 0.05 criteria was used to determine if the permutational tests suggested that the results were significantly different from those expected if the null hypothesis were correct. Permutational tests were performed using 999 permutations.
 
 ### 22. Data exclusion
 
