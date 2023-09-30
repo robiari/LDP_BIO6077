@@ -271,13 +271,6 @@ To do this, an *aspect* function [@dorman2021] indicating the direction (in degr
 
 The *eastness* and *northness* variables were then calculated according to the following equations:
 
-<<<<<<< HEAD
-$$eastness = sin(aspect(mnt) * \pi / 180)$$ $$northness = cos(aspect(mnt) * \pi / 180)$$
-
-These were then related to the slope in radians in order to better represent the topography of the territory [@piedallu2008; @pierce2005].
-
-$$pente = (slope(mnt) * \pi) / 180$$ et $$eastness exposure = sin(pente)*eastness$$ $$northness exposure = sin(pente)*northness$$
-=======
 $$eastness = sin(aspect(mnt) * \pi / 180)$$
 $$northness = cos(aspect(mnt) * \pi / 180)$$
 
@@ -287,7 +280,6 @@ $$pente = (slope(mnt) * \pi) / 180$$
 et
 $$eastness exposure = sin(pente)*eastness$$
 $$northness exposure = sin(pente)*northness$$
->>>>>>> 78ec4fb19183461b9e28c23d5c80adbf0d8ae6e9
 
 ### 18. Indices
 
@@ -429,8 +421,4 @@ If there is any additional information that you feel needs to be included in you
 
 ## Appendix 1. Figures
 
-<<<<<<< HEAD
 ![Location of the study area. a : Boundary map of the Station de biologie des Laurentides. The orange rectangle targets zones 1, 2 and 3. b: Map of all three zones. The brown rectangle targets zone 1. c: Part of the tree crown polygons annotated in *ArcGIS Pro*.](../03_figs/Figure2.png)
-=======
-![Location of the study area. a : Boundary map of the Station de biologie des Laurentides. The orange rectangle targets zones 1, 2 and 3. b: Map of all three zones. The brown rectangle targets zone 1. c: Part of the tree crown polygons annotated in *ArcGIS Pro*.](../03_figs/FigureA2.png)
->>>>>>> 78ec4fb19183461b9e28c23d5c80adbf0d8ae6e9
