@@ -18,28 +18,30 @@ Natural and anthropogenic disturbances such as fire, logging and insect epidemic
 
 The study area, located on the west shore of Lac Croche at the Station de biologie des Laurentides (SBL) of the Université de Montréal, is in the bioclimatic range of the yellow birch maple stand [@ministèredesressourcesnaturellesetdesforêts2022]. However, it has been found that yellow birch maple stands are practically non-existent on the territory [@savage2001]. Interesting questions then arise... If the ecoforest communities are not yellow birch maple stands, what are they? What ecological processes are responsible for the composition of ecoforest communities in the study area? At what spatial scales do they operate?
 
-**File structure:**
+**Repository structure:**
 
+*See the tree.md file in the repository for more info on the repository structure.*
+
+-   README.md
 -   *00_rawdata:* contains all raw data files (stored on Google Drive)
-
+    -   \_DATA-DICTIONARY.md
+    -   \_README.md
 -   *01_scripts:* contains all scripts of the data
-
+    -   \_README.md
+    -   main_scripts
+    -   r_functions
 -   *02_outdata:* contains all output data files (stored on Google Drive)
-
+    -   \_DATA-DICTIONARY.md
 -   *03_figs:* contains all plots and figures of the data (stored on Google Drive)
-
 -   *04_manuscript:* contains all RMD scripts, .docx, .pdf, .bib and .csl files needed for the manuscript
-
+    -   \_README.md
 -   *05_preregistration:* contains all RMD scripts, .docx, .pdf .bib and .csl files needed for the preregistration form
-
+    -   \_README.md
 -   *renv:* Files needed for packages version control.
 
 **File naming conventions:** *Not in place at the moment, work in progress*
 
 -   *Manuscripts:* LastName_Project_File-contents_Version.file-type
-
 -   *Figures and plots:* LastName_Project_Figure-title_Version.file-type
-
 -   *Analysis:* LastName_Project_Analysis_Version.file-type
-
 -   *Data:* LastName_Project_Data-file-description_Version.file-type
