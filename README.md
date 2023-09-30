@@ -20,13 +20,13 @@ The study area, located on the west shore of Lac Croche at the Station de biolog
 
 **File structure:**
 
--   *00_rawdata:* contains all raw data files
+-   *00_rawdata:* contains all raw data files (stored on Google Drive) <https://drive.google.com/drive/folders/16qgryxH12IPm8fjGiXW0PL2hCzGLcgF1?usp=drive_link>
 
 -   *01_scripts:* contains all scripts of the data
 
--   *02_outdata:* contains all output data files
+-   *02_outdata:* contains all output data files (stored on Google Drive) <https://drive.google.com/drive/folders/1xUlpKRUI9ztKe6WQIKm-THxn_sencYzs?usp=drive_link>
 
--   *03_figs:* contains all plots and figures of the data
+-   *03_figs:* contains all plots and figures of the data (stored on Google Drive) <https://drive.google.com/drive/folders/19znIq_ia4cUebtD0VjFtEIe7uJQ-fZpv?usp=drive_link>
 
 -   *04_manuscript:* contains all RMD scripts, .docx, .pdf, .bib and .csl files needed for the manuscript
 
