@@ -33,4 +33,3 @@ project_root/
 ├─── renv/
 ├─── renv.lock
 └─── tree.md
-
