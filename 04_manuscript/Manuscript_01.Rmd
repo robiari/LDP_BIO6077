@@ -1,8 +1,11 @@
 ---
-title: "Travail de session"
+title: "Succession forestière après feu : Où la forêt en est-elle rendue 100 ans plus tard?"
 author: "Ariane Roberge"
 date: "`r Sys.Date()`"
-output: pdf_document
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 2
 #  word_document: 
 #    reference_docx: text_template_for_RMD.docx
 bibliography: references.bib
@@ -38,8 +41,6 @@ library(sf)
 #library(esri2sf)
 library(tidyverse)
 ```
-
-# Table des matières
 
 # Liste des tableaux
 
