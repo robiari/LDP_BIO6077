@@ -1,7 +1,6 @@
 #### EXTRACTION DES DONNÉES LiDAR ####
 #### Importation des packages ----
 library(tidyverse)
-#library(raster)
 library(stars)
 library(sf)
 library(starsExtra)
@@ -317,4 +316,4 @@ tmap_save(tm = carte_east_north_exp, # objet tmap qu'on veut enregistrer
           dpi = 300) # par défault dpi = 300, on augmente pour une meilleure résolution
 
 #### Exportation de grid_topo en GEOJSON ----
-st_write(grid_topo, dsn = "02_outdata/grid_topo.geojson", driver = "GeoJSON") ## package sf
+write_sf(grid_topo, dsn = "02_outdata/grid_topo.geojson", driver = "GeoJSON", delete_dsn = TRUE) ## package sf

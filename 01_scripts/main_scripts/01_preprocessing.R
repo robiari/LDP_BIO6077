@@ -5,7 +5,6 @@
 #### Importation des packages ----
 library(tidyverse)
 library(sf)
-#library(esri2sf)
 
 
 #### Importation et nettoyage des données d'arbres (type sf) ----
@@ -95,8 +94,9 @@ grid <- grid %>%
 
 #### Exportation de grid en GEOJSON et de grid_coord en csv ----
 # à décommenter lorsqu'on roule le code pour la première fois
-st_write(grid, dsn = "02_outdata/grid.geojson", driver = "GeoJSON") ## package sf
-#st_write(grid, dsn = "02_outdata/grid.shp") ## package sf
+#st_write(grid, dsn = "02_outdata/grid.geojson", driver = "GeoJSON") ## package sf
+# ou tout simplement rouler write_sf à la place
+write_sf(grid, dsn = "02_outdata/grid.geojson", driver = "GeoJSON", delete_dsn = TRUE) ## package sf
 write.csv(grid_coord,"02_outdata/grid_coord.csv", row.names = FALSE)
 
 #### Sélection des arbres se trouvant dans les placettes sélectionnées ----
