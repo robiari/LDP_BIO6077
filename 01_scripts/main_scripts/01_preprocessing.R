@@ -6,7 +6,6 @@
 library(tidyverse)
 library(sf)
 
-
 #### Importation et nettoyage des données d'arbres (type sf) ----
 Z1_polygones <- read_sf("00_rawdata/Z1_polygones.geojson") %>% # on lit le fichier
   st_transform(2950) %>% # on transforme au code 2950
